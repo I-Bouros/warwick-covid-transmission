@@ -7,9 +7,7 @@
 [![codecov](https://codecov.io/gh/I-Bouros/warwick-covid-transmission/branch/main/graph/badge.svg?token=SNHCUJIS3B)](https://codecov.io/gh/I-Bouros/warwick-covid-transmission)
 [![Style (flake8)](https://github.com/I-Bouros/warwick-covid-transmission/actions/workflows/flake8-style-test.yml/badge.svg)](https://github.com/I-Bouros/warwick-covid-transmission/actions/workflows/flake8-style-test.yml)
 
-A collection of multiple epidemiological models used in the modelling of cases observed during the COVID-19 pandemic. Amongst the models curated in this collection are:
-- *PHE & Cambridge*: an official model used by the UK government for policy making.
-- *Roche*: a model developed by F. Hoffmann-La Roche Ltd.
+This is a reimplementation of the Warwick-Lancaster model.
 
 All features of our software are described in detail in our
 [full API documentation](https://warwick-covid-transmission.readthedocs.io/en/latest/).
@@ -18,9 +16,7 @@ More details on epidemiological models and inference can be found in these
 papers:
 
 ## References
-[1] Birrell, Paul and Blake, Joshua and van Leeuwen, Edwin and , and Gent, Nick and De Angelis, Daniela (2020). [Real-time Nowcasting and Forecasting of COVID-19 Dynamics in England: the first wave?](https://www.medrxiv.org/content/early/2020/08/30/2020.08.24.20180737). In medRxiv. 
-
-[2] Lemenuel-Diot, Annabelle and Clinch, Barry and Hurt, Aeron C. and Boutry, Paul and Laurent, Johann and Leddin, Mathias and Frings, Stefan and Charoin, Jean Eric (2020). [A COVID-19 transmission model informing medication development and supply chain needs](https://www.medrxiv.org/content/early/2020/12/02/2020.11.23.20237404). In medRxiv.
+[1] Moore, S., Hill, E.M., Dyson, L. et al. [Retrospectively modeling the effects of increased global vaccine sharing on the COVID-19 pandemic](https://doi.org/10.1038/s41591-022-02064-y). Nat Med 28, 2416–2423 (2022).
 
 ## Installation procedure
 ***
