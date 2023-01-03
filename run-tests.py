@@ -1,7 +1,7 @@
 # This file contains code for running all tests.
 #
-# This file is part of EPIMODELS
-# (https://github.com/I-Bouros/multi-epi-model-cross-analysis.git) which is
+# This file is part of WARWICKMODEL
+# (https://github.com/I-Bouros/warwick-covid-transmission.git) which is
 # released under the MIT license. See accompanying LICENSE for copyright
 # notice and full license details.
 #
@@ -19,7 +19,7 @@ def run_unit_tests():
     """
     This function runs our unit tests.
     """
-    tests = os.path.join('epimodels', 'tests')
+    tests = os.path.join('warwickmodel', 'tests')
     tests_suite = unittest.defaultTestLoader.discover(tests,
                                                       pattern='test*.py')
     result = unittest.TextTestRunner(verbosity=2).run(tests_suite)
@@ -46,18 +46,18 @@ def run_copyright_checks():
             print('Copyright notice in LICENSE is NOT up-to-date.')
             year_check = False
 
-    # Recursively walk the epimodels directory and check copyright header is in
-    # each checked file type
+    # Recursively walk the warwickmodel directory and check copyright header
+    # is in each checked file type
     header_check = True
     checked_file_types = ['.py']
     copyright_header = """#
-# This file is part of EPIMODELS
-# (https://github.com/I-Bouros/multi-epi-model-cross-analysis.git) which is
+# This file is part of WARWICKMODEL
+# (https://github.com/I-Bouros/warwick-covid-transmission.git) which is
 # released under the MIT license. See accompanying LICENSE for copyright
 # notice and full license details.
 #"""
 
-    for dirname, subdir_list, file_list in os.walk('epimodels'):
+    for dirname, subdir_list, file_list in os.walk('warwickmodel'):
         for f_name in file_list:
             if any([f_name.endswith(x) for x in checked_file_types]):
                 path = os.path.join(dirname, f_name)
@@ -132,27 +132,22 @@ def doctest_rst_and_public_interface():
     print('\nChecking that all classes and methods are documented in an RST '
           'file and that public interfaces are clean.')
 
-    # Import all public epimodels modules. We list
-    # everything here for completeness. If a new module is added to epimodels
-    # it should be imported here for this doctest.
-    import epimodels
+    # Import all public warwickmodel modules. We list
+    # everything here for completeness. If a new module is added to
+    # warwickmodel it should be imported here for this doctest.
+    import warwickmodel
 
     # If any modules other than these are exposed it may indicate that a module
     # has been inadvertently exposed in a public context, or that a new module
-    # has been added to epimodels and should be imported above and included in
-    # this list.
-    epimodels_submodules = [
-        'epimodels.version_info',
-        'epimodels._setup_matrices',
-        'epimodels._parameters',
-        'epimodels.phe_model',
-        'epimodels.roche_model',
-        'epimodels.inference'
+    # has been added to warwickmodel and should be imported above and included
+    # in this list.
+    warwickmodel_submodules = [
+        'warwickmodel.version_info',
         ]
 
     doc_symbols = get_all_documented_symbols()
 
-    check_exposed_symbols(epimodels, epimodels_submodules, doc_symbols)
+    check_exposed_symbols(warwickmodel, warwickmodel_submodules, doc_symbols)
 
     print('All classes and methods are documented in an RST file, and all '
           'public interfaces are clean.')
@@ -191,9 +186,9 @@ def check_exposed_symbols(module, submodule_names, doc_symbols):
             print('  unexpected module: ' + m.__name__)
 
         print('For python modules such as numpy you may need to confine the '
-              'import to the function scope. If you have created a new'
-              'epimodels submodule, you will need to make %s (doctest) aware'
-              'of this.'
+              'import to the function scope. If you have created a new '
+              'warwickmodel submodule, you will need to make %s (doctest) '
+              'aware of this.'
               % __file__)
         print('FAILED')
         sys.exit(1)
@@ -286,9 +281,9 @@ def get_all_documented_symbols():
 if __name__ == '__main__':
     # Set up argument parsing
     parser = argparse.ArgumentParser(
-        description='Run unit test for epimodels',
+        description='Run unit test for warwickmodel',
         epilog='To run individual unit tests, use e.g.'
-               ' $ python3 epimodels/tests/test_dummy.py',
+               ' $ python3 warwickmodel/tests/test_dummy.py',
     )
     # Unit tests
     parser.add_argument(

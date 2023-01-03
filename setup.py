@@ -1,8 +1,8 @@
 #
-# epimodels setuptools script
+# warwickmodel setuptools script
 #
-# This file is part of EPIMODELS
-# (https://github.com/I-Bouros/multi-epi-model-cross-analysis.git) which is
+# This file is part of WARWICKMODEL
+# (https://github.com/I-Bouros/warwick-covid-transmission.git) which is
 # released under the MIT license. See accompanying LICENSE for copyright
 # notice and full license details.
 #
@@ -11,8 +11,8 @@ from setuptools import setup, find_packages
 
 def get_version():
     """
-    Get version number from the epimodels module.
-    The easiest way would be to just ``import epimodels ``, but note that this may  # noqa
+    Get version number from the warwickmodel module.
+    The easiest way would be to just ``import warwickmodel ``, but note that this may  # noqa
     fail if the dependencies have not been installed yet. Instead, we've put
     the version number in a simple version_info module, that we'll import here
     by temporarily adding the oxrse directory to the pythonpath using sys.path.
@@ -20,7 +20,7 @@ def get_version():
     import os
     import sys
 
-    sys.path.append(os.path.abspath('epimodels'))
+    sys.path.append(os.path.abspath('warwickmodel'))
     from version_info import VERSION as version
     sys.path.pop()
 
@@ -37,12 +37,12 @@ def get_readme():
 
 setup(
     # Module name (lowercase)
-    name='epimodels',
+    name='warwickmodel',
 
     # Version
     version=get_version(),
 
-    description='A collection of multiple epidemiological models used in the modelling of cases observed during the COVID-19 pandemic.',  # noqa
+    description='This is a reimplementation of the Warwick-Lancaster model.',  # noqa
 
     long_description_content_type='text/markdown',
 
@@ -58,10 +58,10 @@ setup(
 
     maintainer_email='',
 
-    url='https://github.com/I-Bouros/multi-epi-model-cross-analysis.git',
+    url='https://github.com/I-Bouros/warwick-covid-transmission.git',
 
     # Packages to include
-    packages=find_packages(include=('epimodels', 'epimodels.*')),
+    packages=find_packages(include=('warwickmodel', 'warwickmodel.*')),
     include_package_data=True,
 
     # List of dependencies

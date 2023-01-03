@@ -1,0 +1,5 @@
+[run]
+source = warwickmodel
+omit = 
+    warwickmodel/tests/*
+    warwickmodel/data/*
