@@ -71,6 +71,7 @@ setup(
         'pandas',
         'scipy',
         'pints @ git+https://github.com/pints-team/pints.git#egg=pints-latest',
+        'epimodels @ git+https://github.com/I-Bouros/multi-epi-model-cross-analysis.git',  # noqa
         'plotly',
         'kaleido',
         'iteration_utilities'

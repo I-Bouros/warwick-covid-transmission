@@ -1,6 +1,6 @@
 #
 # Root of the warwickmodel module.
-# Provides access to all shared functionality (phe, roche, etc.).
+# Provides access to all shared functionality.
 #
 # This file is part of WARWICKMODEL
 # (https://github.com/I-Bouros/warwick-covid-transmission.git) which is
@@ -14,8 +14,23 @@ during an outbreak of the SARS-Cov-2 virus.
 
 The submodule epimodels.inference provides functionality for running parameter
 inference on all our models using both optimisation and sampling methods, using
-the PINTS python module.
+the PINTS and epimodels python modules.
 """
 
 # Import version info
 from .version_info import VERSION_INT, VERSION  # noqa
+
+# Import inference submodule
+from . import inference  # noqa
+
+# Import models
+from .model import WarwickLancSEIRModel  # noqa
+
+# Import model parameter controller classes
+from._parameters import (  # noqa
+    ICs,
+    RegParameters,
+    DiseaseParameters,
+    SimParameters,
+    ParametersController
+)
