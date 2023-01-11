@@ -347,65 +347,6 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         self._output_indices = output_indices
         self._n_outputs = len(outputs)
 
-    def _compute_vaccine_effects(self, w, niu, r):
-        """
-        Computes the vaccine effects on the virus dynamics depending on the
-        present levels of vaccines available in a given region and at a
-        specified timepoint.
-
-        Parameters
-        ----------
-        w : list of lists
-            Timeline of the levels of available vaccine for different
-            countries.
-        niu : 3D np.array
-            Timeline of the levels of the decaying efficacy parameter for
-            different vaccination statuses (unvaccinated, fully-vaccinated,
-            boosted, partially-waned, fully-waned, previous-variant immunity)
-            and different targeted effects (transmission, symptom development,
-            infectiousness, severe outcomes).
-        r : int
-            The index of the region to which the current instance of the ODEs
-            system refers.
-
-        Returns
-        -------
-        int or float
-            Stringency index in the given region and at the specified
-            timepoint.
-
-        """
-        # Identify the current time and region vaccine levels
-        w_r = w[r-1]
-        tol = 10
-
-        nu_tra = np.ones((len(self._times), 6))
-        nu_symp = np.ones((len(self._times), 6))
-        nu_inf = np.ones((len(self._times), 6))
-        nu_sev = np.ones((len(self._times), 6))
-
-        for _, t in enumerate(self._times):
-            if _ >= tol:
-                nu_tra[_, :] = np.sum(np.matmul(
-                    np.diag(w_r[:tol][::-1]), niu[(_-tol+1):_, 0, :]), axis=0)
-                nu_symp[_, :] = np.sum(np.matmul(
-                    np.diag(w_r[:tol][::-1]), niu[(_-tol+1):_, 1, :]), axis=0)
-                nu_inf[_, :] = np.sum(np.matmul(
-                    np.diag(w_r[:tol][::-1]), niu[(_-tol+1):_, 2, :]), axis=0)
-                nu_sev[_, :] = np.sum(np.matmul(
-                    np.diag(w_r[:tol][::-1]), niu[(_-tol+1):_, 3, :]), axis=0)
-            else:
-                nu_tra[_, :] = np.sum(np.matmul(
-                    np.diag(w_r[:_][::-1]), niu[:_, 0, :]), axis=0)
-                nu_symp[_, :] = np.sum(np.matmul(
-                    np.diag(w_r[:_][::-1]), niu[:_, 1, :]), axis=0)
-                nu_inf[_, :] = np.sum(np.matmul(
-                    np.diag(w_r[:_][::-1]), niu[:_, 2, :]), axis=0)
-                nu_sev[_, :] = np.sum(np.matmul(
-                    np.diag(w_r[:_][::-1]), niu[:_, 3, :]), axis=0)
-
-        return [nu_tra, nu_symp, nu_inf, nu_sev]
-
     def _right_hand_side(self, t, r, y, c, num_a_groups):
         r"""
         Constructs the RHS of the equations of the system of ODEs for given a
@@ -501,22 +442,9 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         phi = self.social_distancing_param
 
         # Read the vaccination parameters of the system
-        vac_all, vacb_all = self.vaccine_param[:2]
+        vac_all, vacb_all, nu_tra, nu_symp, nu_inf = self.vaccine_param[:5]
 
         vac, vacb = vac_all[r-1], vacb_all[r-1]
-
-        # # Identify the appropriate MultiTimesInfectivity matrix for the
-        # # ODE system
-        # pos = np.where(self._times <= t)
-        # ind = pos[-1][-1]
-
-        # nu_tra = self._nu_tra_all[ind, :]
-        # nu_symp = self._nu_symp_all[ind, :]
-        # nu_inf = self._nu_inf_all[ind, :]
-
-        nu_tra = self._nu_tra_all
-        nu_symp = self._nu_symp_all
-        nu_inf = self._nu_inf_all
 
         # Read parameters of the system
         beta, alpha, gamma, d, tau, we, omega = c
@@ -529,47 +457,43 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             self.contacts_timeline.identify_current_contacts(r, t)
 
         # Write actual RHS
-        lam = phi * nu_tra[0] * nu_inf[0] * np.multiply(
-            beta, np.asarray(i) + tau * np.asarray(a))
-        lam_times_s = omega * \
-            np.multiply(s, np.dot(cont_mat, lam))
+        lam = nu_inf[0] * np.multiply(beta, np.dot(
+            cont_mat, np.asarray(i) + tau * np.asarray(a)))
+        lam_times_s = omega * phi * nu_tra[0] * np.multiply(s, lam)
 
-        lam_F = phi * nu_tra[1] * nu_inf[1] * np.multiply(
-            beta, np.asarray(iF) + tau * np.asarray(aF))
-        lam_F_times_s = omega * \
-            np.multiply(sF, np.dot(cont_mat, lam_F))
+        lam_F = nu_inf[1] * np.multiply(beta, np.dot(
+            cont_mat, np.asarray(iF) + tau * np.asarray(aF)))
+        lam_F_times_s = omega * phi * nu_tra[1] * np.multiply(sF, lam_F)
 
-        lam_B = phi * nu_tra[2] * nu_inf[2] * np.multiply(
-            beta, np.asarray(iB) + tau * np.asarray(aB))
-        lam_B_times_s = omega * \
-            np.multiply(sB, np.dot(cont_mat, lam_B))
+        lam_B = nu_inf[2] * np.multiply(beta, np.dot(
+            cont_mat, np.asarray(iB) + tau * np.asarray(aB)))
+        lam_B_times_s = omega * phi * nu_tra[2] * np.multiply(sB, lam_B)
 
-        lam_W1 = phi * nu_tra[3] * nu_inf[3] * np.multiply(
-            beta, np.asarray(iW1) + tau * np.asarray(aW1))
-        lam_W1_times_s = omega * \
-            np.multiply(sW1, np.dot(cont_mat, lam_W1))
+        lam_W1 = nu_inf[3] * np.multiply(beta, np.dot(
+            cont_mat, np.asarray(iW1) + tau * np.asarray(aW1)))
+        lam_W1_times_s = omega * phi * nu_tra[3] * np.multiply(sW1, lam_W1)
 
-        lam_W2 = phi * nu_tra[4] * nu_inf[4] * np.multiply(
-            beta, np.asarray(iW2) + tau * np.asarray(aW2))
-        lam_W2_times_s = omega * \
-            np.multiply(sW2, np.dot(cont_mat, lam_W2))
+        lam_W2 = nu_inf[4] * np.multiply(beta, np.dot(
+            cont_mat, np.asarray(iW2) + tau * np.asarray(aW2)))
+        lam_W2_times_s = omega * phi * nu_tra[4] * np.multiply(sW2, lam_W2)
 
-        lam_W3 = phi * nu_tra[5] * nu_inf[5] * np.multiply(
-            beta, np.asarray(iW3) + tau * np.asarray(aW3))
-        lam_W3_times_s = omega * \
-            np.multiply(sW3, np.dot(cont_mat, lam_W3))
+        lam_W3 = nu_inf[5] * np.multiply(beta, np.dot(
+            cont_mat, np.asarray(iW3) + tau * np.asarray(aW3)))
+        lam_W3_times_s = omega * phi * nu_tra[5] * np.multiply(sW3, lam_W3)
 
         dydt = np.concatenate((
             -lam_times_s - vac * np.asarray(s) + we1 * np.asarray(
                 sW2) + we1 * np.asarray(sW3),
             -lam_F_times_s + vac * np.asarray(s) - we1 * np.asarray(
                 sF) - vacb * np.asarray(sF),
-            -lam_B_times_s + vacb * np.asarray(sF) - we1 * np.asarray(
-                sB) + vacb * np.asarray(sB) + vacb * np.array(sW2),
+            -lam_B_times_s + vacb * np.asarray(sF) + vacb * np.asarray(
+                sB) + vacb * np.array(sW1) + vacb * np.array(
+                sW2) + self._eps * vacb * np.array(_) - we1 * np.asarray(sB),
             -lam_W1_times_s - we1 * np.asarray(sW1) + we1 * np.array(
                 sB) - vacb * np.asarray(sW1) + we1 * np.array(_),
-            -lam_W2_times_s + vac * np.asarray(s) - we1 * np.asarray(
-                sF) - vacb * np.asarray(sF) - we3 * np.asarray(sW2),
+            -lam_W2_times_s - vacb * np.asarray(sW2) + we1 * np.asarray(
+                sF) + we1 * np.asarray(sW1) - we1 * np.asarray(
+                sW2) - we3 * np.asarray(sW2),
             -lam_W3_times_s + we3 * np.asarray(sW2) - we1 * np.asarray(sW3),
             lam_times_s - alpha * np.asarray(e1),
             alpha * (np.asarray(e1) - np.asarray(e2)),
@@ -631,7 +555,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
                 np.asarray(aF) + np.asarray(iB) + np.asarray(aB) +
                 np.asarray(iW1) + np.asarray(aW1) + np.asarray(iW2) +
                 np.asarray(aW2) + np.asarray(iW3) + np.asarray(aW3)
-                ) - we1 * np.asarray(_)
+                ) - we1 * np.asarray(_) - self._eps * vacb * np.array(_)
             ))
 
         return dydt
@@ -737,15 +661,6 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             self.time_changes_region)
 
         self._times = np.asarray(times)
-
-        # w, niu = self.vaccine_param[2:4]
-
-        # self._nu_tra_all, self._nu_symp_all, self._nu_inf_all, \
-        #     self._nu_sev_all = self._compute_vaccine_effects(
-        #         w, niu, self._region)
-
-        self._nu_tra_all, self._nu_symp_all, self._nu_inf_all, \
-            self._nu_sev_all = self.vaccine_param[2:]
 
         # Simulation using the scipy solver
         sol = self._scipy_solver(times, self._num_ages, method)
@@ -853,7 +768,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         self.vaccine_param = parameters.vaccine_parameters()
 
         return self._simulate(
-            parameters(), parameters.vaccine_parameters.times)
+            parameters(), parameters.simulation_parameters.times)
 
     def _simulate(self, parameters, times):
         r"""
@@ -884,8 +799,11 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             (7) the reduction in the transmission rate of infection
             for asymptomatic individuals (tau),
             (8) the rates of waning of immunity (we)
-            (9) the change in susceptibility due to the variant (omega) and
-            (10) the type of solver implemented by the :meth:`scipy.solve_ivp`.
+            (9) the change in susceptibility due to the variant (omega)
+            (10) the type of solver implemented by the :meth:`scipy.solve_ivp`
+            and
+            (11) the indicator parameter for deploying boosters to the
+            recovered compartment.
             Splited into the formats necessary for the :meth:`_simulate`
             method.
         times : list
@@ -954,6 +872,9 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         # Add method
         method = parameters[start_index + 5 + 3 * n_ages]
 
+        # Add eps
+        self._eps = int(parameters[start_index + 6 + 3 * n_ages])
+
         return self._split_simulate(my_parameters,
                                     times,
                                     method)
@@ -1002,8 +923,10 @@ class WarwickLancSEIRModel(pints.ForwardModel):
 
         Returns
         -------
-        nunmpy.array
-            Age-structured matrix of the number of new symptomatic infections
+        list of numpy.array
+            Age-structured matrices of the number of new symptomatic infections
+            for different vaccination statuses (unvaccinated, fully-vaccinated,
+            boosted, partially-waned, fully-waned, previous-variant immunity)
             from the simulation method for the WarwickLancSEIRModel.
 
         Notes
@@ -1017,12 +940,16 @@ class WarwickLancSEIRModel(pints.ForwardModel):
 
         # Read parameters of the system
         alpha, d = self._c[1], self._c[3]
+        nu_symp = self.vaccine_param[3]
 
         d_infec = np.empty((self._times.shape[0], self._num_ages))
+        d_infec_F = np.empty((self._times.shape[0], self._num_ages))
+        d_infec_B = np.empty((self._times.shape[0], self._num_ages))
+        d_infec_W1 = np.empty((self._times.shape[0], self._num_ages))
+        d_infec_W2 = np.empty((self._times.shape[0], self._num_ages))
+        d_infec_W3 = np.empty((self._times.shape[0], self._num_ages))
 
         for ind, _ in enumerate(self._times.tolist()):
-            nu_symp = self._nu_symp_all[ind, :]
-
             # Read from output
             e5 = output[ind, :][(10*self._num_ages):(11*self._num_ages)]
             e5F = output[ind, :][(15*self._num_ages):(16*self._num_ages)]
@@ -1032,62 +959,97 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             e5W3 = output[ind, :][(35*self._num_ages):(36*self._num_ages)]
 
             # fraction of new infectives in delta_t time step
-            d_infec[ind, :] = alpha * np.multiply(
-                d,
-                nu_symp[0] * e5 + nu_symp[1] * e5F + nu_symp[2] * e5B +
-                nu_symp[3] * e5W1 + nu_symp[4] * e5W2 + nu_symp[5] * e5W3)
+            d_infec[ind, :] = alpha * nu_symp[0] * np.multiply(d, e5)
+            d_infec_F[ind, :] = alpha * nu_symp[1] * np.multiply(d, e5F)
+            d_infec_B[ind, :] = alpha * nu_symp[2] * np.multiply(d, e5B)
+            d_infec_W1[ind, :] = alpha * nu_symp[3] * np.multiply(d, e5W1)
+            d_infec_W2[ind, :] = alpha * nu_symp[4] * np.multiply(d, e5W2)
+            d_infec_W3[ind, :] = alpha * nu_symp[5] * np.multiply(d, e5W3)
 
             if np.any(d_infec[ind, :] < 0):  # pragma: no cover
                 d_infec[ind, :] = np.zeros_like(d_infec[ind, :])
+            if np.any(d_infec_F[ind, :] < 0):  # pragma: no cover
+                d_infec_F[ind, :] = np.zeros_like(d_infec_F[ind, :])
+            if np.any(d_infec_B[ind, :] < 0):  # pragma: no cover
+                d_infec_B[ind, :] = np.zeros_like(d_infec_B[ind, :])
+            if np.any(d_infec_W1[ind, :] < 0):  # pragma: no cover
+                d_infec_W1[ind, :] = np.zeros_like(d_infec_W1[ind, :])
+            if np.any(d_infec_W2[ind, :] < 0):  # pragma: no cover
+                d_infec_W2[ind, :] = np.zeros_like(d_infec_W2[ind, :])
+            if np.any(d_infec[ind, :] < 0):  # pragma: no cover
+                d_infec_W3[ind, :] = np.zeros_like(d_infec_W3[ind, :])
 
-        return d_infec
+        return [
+            d_infec, d_infec_F, d_infec_B, d_infec_W1, d_infec_W2, d_infec_W3]
 
     def _check_new_infections_format(self, new_infections):
         """
-        Checks correct format of the new symptomatic infections matrix.
+        Checks correct format of the list new symptomatic infections matrices
+        for different vaccination statuses (unvaccinated, fully-vaccinated,
+        boosted, partially-waned, fully-waned, previous-variant immunity).
 
         Parameters
         ----------
-        new_infections : numpy.array
-            Age-structured matrix of the number of new symptomatic infections.
+        new_infections : list of numpy.array
+            Age-structured matrices of the number of new symptomatic infections
+            for different vaccination statuses (unvaccinated, fully-vaccinated,
+            boosted, partially-waned, fully-waned, previous-variant immunity).
 
         """
-        if np.asarray(new_infections).ndim != 2:
+        if np.asarray(new_infections).ndim != 3:
             raise ValueError(
-                'Model new infections storage format must be 2-dimensional.')
-        if np.asarray(new_infections).shape[0] != self._times.shape[0]:
+                'Model new infections storage format must be 3-dimensional.')
+        if np.asarray(new_infections).shape[0] != 6:
+            raise ValueError(
+                    'Wrong number of vaccination statuses for the model new \
+                    infections.')
+        if np.asarray(new_infections).shape[1] != self._times.shape[0]:
             raise ValueError(
                     'Wrong number of rows for the model new infections.')
-        if np.asarray(new_infections).shape[1] != self._num_ages:
+        if np.asarray(new_infections).shape[2] != self._num_ages:
             raise ValueError(
                     'Wrong number of columns for the model new infections.')
         for r in np.asarray(new_infections):
             for _ in r:
-                if not isinstance(_, (np.integer, np.floating)):
-                    raise TypeError(
-                        'Model`s new infections elements must be integer or \
-                            float.')
+                for _ in r:
+                    if not isinstance(_, (np.integer, np.floating)):
+                        raise TypeError(
+                            'Model`s new infections elements must be integer \
+                                or float.')
 
-    def new_infection_outcomes(self, output):
+    def new_hospitalisations(self, new_infections, pItoH, dItoH):
         """
-        Computes number of new infection outcomes at each time step in
-        specified region, given the simulated timeline of susceptible number
-        of individuals, for all age groups in the model.
+        Computes number of new hospital admissions at each time step in
+        specified region, given the simulated timeline of detectable
+        symptomatic infected number of individuals, for all age groups
+        in the model.
 
-        It uses an output of the simulation method for the
-        WarwickLancSEIRModel, taking all the rest of the parameters necessary
-        for the computation from the way its simulation has been fitted.
+        It uses the array of the number of new symptomatic infections, obtained
+        from an output of the simulation method for the WarwickLancSEIRModel,
+        a distribution of the delay between onset of symptoms and
+        hospitalisation, as well as the fraction of the number of symptomatic
+        cases that end up hospitalised.
 
         Parameters
         ----------
-        output : numpy.array
-            Age-structured output of the simulation method for the
-            WarwickLancSEIRModel.
+        new_infections : list of numpy.array
+            Age-structured arrays of the daily number of new symptomatic
+            infections for different vaccination statuses (unvaccinated, fully-
+            vaccinated, boosted, partially-waned, fully-waned, previous-variant
+            immunity).
+        pItoH : int or float
+            Age-dependent fractions of the number of symptomatic cases that
+            end up hospitalised.
+        dItoH : list
+            Distribution of the delay between onset of symptoms and
+            hospitalisation. Must be normalised.
 
         Returns
         -------
-        nunmpy.array
-            Age-structured matrix of the number of new infection outcomes
+        list of numpy.array
+            Age-structured matrix of the number of new hospital admissions
+            for different vaccination statuses (unvaccinated, fully-vaccinated,
+            boosted, partially-waned, fully-waned, previous-variant immunity)
             from the simulation method for the WarwickLancSEIRModel.
 
         Notes
@@ -1096,84 +1058,9 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         one.
 
         """
-        # Check correct format of parameters
-        self._check_output_format(output)
+        # Read parameters of the system
+        nu_sev_h = self.vaccine_param[5]
 
-        # Age-based total dead is dead 'd'
-        n_daily_infec_out = np.zeros((self._times.shape[0], self._num_ages))
-        total_infec_out = output[:, (48*self._num_ages):(49*self._num_ages)]
-        n_daily_infec_out[1:, :] = \
-            total_infec_out[1:, :] - total_infec_out[:-1, :]
-
-        for ind, t in enumerate(self._times.tolist()):  # pragma: no cover
-            if np.any(n_daily_infec_out[ind, :] < 0):
-                n_daily_infec_out[ind, :] = np.zeros_like(
-                    n_daily_infec_out[ind, :])
-
-        return n_daily_infec_out
-
-    def _check_new_infection_outcomes_format(self, new_infection_outcomes):
-        """
-        Checks correct format of the new infection outcomes matrix.
-
-        Parameters
-        ----------
-        new_infection_outcomes : numpy.array
-            Age-structured matrix of the number of new infection outcomes.
-
-        """
-        if np.asarray(new_infection_outcomes).ndim != 2:
-            raise ValueError(
-                'Model new infection outcomes storage format must be \
-                    2-dimensional.')
-        if np.asarray(new_infection_outcomes).shape[0] != self._times.shape[0]:
-            raise ValueError(
-                    'Wrong number of rows for the model new infection \
-                        outcomes.')
-        if np.asarray(new_infection_outcomes).shape[1] != self._num_ages:
-            raise ValueError(
-                    'Wrong number of columns for the model new infection \
-                        outcomes.')
-        for r in np.asarray(new_infection_outcomes):
-            for _ in r:
-                if not isinstance(_, (np.integer, np.floating)):
-                    raise TypeError(
-                        'Model`s new infection outcomes elements must be \
-                            integer or float.')
-
-    def new_hospitalisations(self, new_infection_outcomes, eta_h, l_h):
-        """
-        Computes number of new hospital admissions at each time step in
-        specified region, given the simulated timeline of infection outcomes,
-        for all age groups in the model.
-
-        It uses the array of the number of new infection outcomes, obtained
-        from an output of the simulation method for the WarwickLancSEIRModel,
-        the delay between onset of symptoms and hospitalisation, as well as
-        the fraction of the number of infection outcomes that end up
-        hospitalised.
-
-        Parameters
-        ----------
-        new_infection_outcomes : numpy.array
-            Age-structured array of the daily number of new infection outcomes.
-        eta_h : list
-            Age-dependent fractions of the number of infection outcomes that
-            end up hospitalised.
-        l_h : int or float
-            Delay between onset of symptoms and hospitalisation.
-
-        Returns
-        -------
-        nunmpy.array
-            Age-structured matrix of the number of new hospital admissions.
-
-        Notes
-        -----
-        Always run :meth:`WarwickLancSEIRModel.simulate` before running this
-        one.
-
-        """
         n_daily_hosp = np.zeros((self._times.shape[0], self._num_ages))
         n_daily_hosp_F = np.zeros((self._times.shape[0], self._num_ages))
         n_daily_hosp_B = np.zeros((self._times.shape[0], self._num_ages))
@@ -1182,109 +1069,164 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         n_daily_hosp_W3 = np.zeros((self._times.shape[0], self._num_ages))
 
         for ind, _ in enumerate(self._times.tolist()):
-            nu_sev = self._nu_sev_all[ind, :]
-            n_daily_hosp[ind + l_h, :] = nu_sev[0] * np.multiply(
-                eta_h, new_infection_outcomes[ind, :])
-            n_daily_hosp_F[ind + l_h, :] = nu_sev[1] * np.multiply(
-                eta_h, new_infection_outcomes[ind, :])
-            n_daily_hosp_B[ind + l_h, :] = nu_sev[2] * np.multiply(
-                eta_h, new_infection_outcomes[ind, :])
-            n_daily_hosp_W1[ind + l_h, :] = nu_sev[3] * np.multiply(
-                eta_h, new_infection_outcomes[ind, :])
-            n_daily_hosp_W2[ind + l_h, :] = nu_sev[4] * np.multiply(
-                eta_h, new_infection_outcomes[ind, :])
-            n_daily_hosp_W3[ind + l_h, :] = nu_sev[5] * np.multiply(
-                eta_h, new_infection_outcomes[ind, :])
+            if ind >= 30:
+                n_daily_hosp[ind, :] = nu_sev_h[0] * np.array(pItoH) * \
+                    np.sum(np.matmul(
+                        np.diag(dItoH[:31][::-1]),
+                        new_infections[0][(ind-30):(ind+1), :]), axis=0)
+                n_daily_hosp_F[ind, :] = nu_sev_h[1] * np.array(pItoH) * \
+                    np.sum(np.matmul(
+                        np.diag(dItoH[:31][::-1]),
+                        new_infections[1][(ind-30):(ind+1), :]), axis=0)
+                n_daily_hosp_B[ind, :] = nu_sev_h[2] * np.array(pItoH) * \
+                    np.sum(np.matmul(
+                        np.diag(dItoH[:31][::-1]),
+                        new_infections[2][(ind-30):(ind+1), :]), axis=0)
+                n_daily_hosp_W1[ind, :] = nu_sev_h[3] * np.array(pItoH) * \
+                    np.sum(np.matmul(
+                        np.diag(dItoH[:31][::-1]),
+                        new_infections[3][(ind-30):(ind+1), :]), axis=0)
+                n_daily_hosp_W2[ind, :] = nu_sev_h[4] * np.array(pItoH) * \
+                    np.sum(np.matmul(
+                        np.diag(dItoH[:31][::-1]),
+                        new_infections[4][(ind-30):(ind+1), :]), axis=0)
+                n_daily_hosp_W3[ind, :] = nu_sev_h[5] * np.array(pItoH) * \
+                    np.sum(np.matmul(
+                        np.diag(dItoH[:31][::-1]),
+                        new_infections[5][(ind-30):(ind+1), :]), axis=0)
+            else:
+                n_daily_hosp[ind, :] = nu_sev_h[0] * np.array(pItoH) * \
+                    np.sum(np.matmul(
+                        np.diag(dItoH[:(ind+1)][::-1]),
+                        new_infections[0][:(ind+1), :]), axis=0)
+                n_daily_hosp_F[ind, :] = nu_sev_h[1] * np.array(pItoH) * \
+                    np.sum(np.matmul(
+                        np.diag(dItoH[:(ind+1)][::-1]),
+                        new_infections[1][:(ind+1), :]), axis=0)
+                n_daily_hosp_B[ind, :] = nu_sev_h[2] * np.array(pItoH) * \
+                    np.sum(np.matmul(
+                        np.diag(dItoH[:(ind+1)][::-1]),
+                        new_infections[2][:(ind+1), :]), axis=0)
+                n_daily_hosp_W1[ind, :] = nu_sev_h[3] * np.array(pItoH) * \
+                    np.sum(np.matmul(
+                        np.diag(dItoH[:(ind+1)][::-1]),
+                        new_infections[3][:(ind+1), :]), axis=0)
+                n_daily_hosp_W2[ind, :] = nu_sev_h[4] * np.array(pItoH) * \
+                    np.sum(np.matmul(
+                        np.diag(dItoH[:(ind+1)][::-1]),
+                        new_infections[4][:(ind+1), :]), axis=0)
+                n_daily_hosp_W3[ind, :] = nu_sev_h[5] * np.array(pItoH) * \
+                    np.sum(np.matmul(
+                        np.diag(dItoH[:(ind+1)][::-1]),
+                        new_infections[5][:(ind+1), :]), axis=0)
 
         for ind, _ in enumerate(self._times.tolist()):  # pragma: no cover
-            if np.any(n_daily_hosp[ind+l_h, :] < 0):
-                n_daily_hosp[ind+l_h, :] = np.zeros_like(
-                    n_daily_hosp[ind+l_h, :])
-            if np.any(n_daily_hosp_F[ind+l_h, :] < 0):
-                n_daily_hosp_F[ind+l_h, :] = np.zeros_like(
-                    n_daily_hosp_F[ind+l_h, :])
-            if np.any(n_daily_hosp_B[ind+l_h, :] < 0):
-                n_daily_hosp_B[ind+l_h, :] = np.zeros_like(
-                    n_daily_hosp_B[ind+l_h, :])
-            if np.any(n_daily_hosp_W1[ind+l_h, :] < 0):
-                n_daily_hosp_W1[ind+l_h, :] = np.zeros_like(
-                    n_daily_hosp_W1[ind+l_h, :])
-            if np.any(n_daily_hosp_W2[ind+l_h, :] < 0):
-                n_daily_hosp_W2[ind+l_h, :] = np.zeros_like(
-                    n_daily_hosp_W2[ind+l_h, :])
-            if np.any(n_daily_hosp_W3[ind+l_h, :] < 0):
-                n_daily_hosp_W3[ind+l_h, :] = np.zeros_like(
-                    n_daily_hosp_W3[ind+l_h, :])
+            if np.any(n_daily_hosp[ind, :] < 0):
+                n_daily_hosp[ind, :] = np.zeros_like(n_daily_hosp[ind, :])
+            if np.any(n_daily_hosp_F[ind, :] < 0):
+                n_daily_hosp_F[ind, :] = np.zeros_like(n_daily_hosp_F[ind, :])
+            if np.any(n_daily_hosp_B[ind, :] < 0):
+                n_daily_hosp_B[ind, :] = np.zeros_like(n_daily_hosp_B[ind, :])
+            if np.any(n_daily_hosp_W1[ind, :] < 0):
+                n_daily_hosp_W1[ind, :] = np.zeros_like(
+                    n_daily_hosp_W1[ind, :])
+            if np.any(n_daily_hosp_W2[ind, :] < 0):
+                n_daily_hosp_W2[ind, :] = np.zeros_like(
+                    n_daily_hosp_W2[ind, :])
+            if np.any(n_daily_hosp[ind, :] < 0):
+                n_daily_hosp_W3[ind, :] = np.zeros_like(
+                    n_daily_hosp_W3[ind, :])
 
-        return (
+        return [
             n_daily_hosp, n_daily_hosp_F, n_daily_hosp_B,
-            n_daily_hosp_W1, n_daily_hosp_W2, n_daily_hosp_W3)
+            n_daily_hosp_W1, n_daily_hosp_W2, n_daily_hosp_W3]
 
-    def check_new_hospitalisation_format(
-            self, new_infection_outcomes, eta_h, l_h):
+    def check_new_hospitalisation_format(self, new_infections, pItoH, dItoH):
         """
         Checks correct format of the inputs of number of hospitalisation
         calculation.
 
         Parameters
         ----------
-        new_infection_outcomes : numpy.array
-            Age-structured array of the daily number of new infection outcomes.
-        eta_h : list
-            Age-dependent fractions of the number of infection outcomes that
+        new_infections : list of numpy.array
+            Age-structured arrays of the daily number of new symptomatic
+            infections for different vaccination statuses (unvaccinated, fully-
+            vaccinated, boosted, partially-waned, fully-waned, previous-variant
+            immunity).
+        pItoH : int or float
+            Age-dependent fractions of the number of symptomatic cases that
             end up hospitalised.
-        l_h : int or float
-            Delay between onset of symptoms and hospitalisation.
+        dItoH : list
+            Distribution of the delay between onset of symptoms and
+            hospitalisation. Must be normalised.
 
         """
-        self._check_new_infection_outcomes_format(new_infection_outcomes)
+        self._check_new_infections_format(new_infections)
 
-        if np.asarray(eta_h).ndim != 1:
-            raise ValueError('Fractions of the number of infection outcomes \
-                that end up hospitalised storage format is 1-dimensional.')
-        if np.asarray(eta_h).shape[0] != self._num_ages:
+        if np.asarray(pItoH).ndim != 1:
+            raise ValueError('Fraction of the number of hospitalised \
+                symptomatic cases storage format is 1-dimensional.')
+        if np.asarray(pItoH).shape[0] != self._num_ages:
             raise ValueError('Wrong number of fractions of the number of\
-                infection outcomes that end up hospitalised.')
-        for _ in eta_h:
+                hospitalised symptomatic cases .')
+        for _ in pItoH:
             if not isinstance(_, (int, float)):
-                raise TypeError('Fractions of the number of infection outcomes\
-                    that end up hospitalised must be integer or float.')
+                raise TypeError('Fraction of the number of hospitalised \
+                    symptomatic cases must be integer or float.')
             if (_ < 0) or (_ > 1):
-                raise ValueError('Fractions of the number of infection\
-                    outcomes that end up hospitalised must be => 0 and <=1.')
+                raise ValueError('Fraction of the number of hospitalised \
+                    symptomatic cases must be => 0 and <=1.')
 
-        if not isinstance(l_h, (int, float)):
-            raise TypeError('Delay between onset of symptoms and \
-                hospitalisation must be integer or float.')
-        if (l_h < 0):
-            raise ValueError('Delay between onset of symptoms and \
-                hospitalisation must be => 0.')
+        if np.asarray(dItoH).ndim != 1:
+            raise ValueError('Delays between onset of symptoms and \
+                hospitalisation storage format is 1-dimensional.')
+        if np.asarray(dItoH).shape[0] != len(self._times):
+            raise ValueError('Wrong number of delays between onset of \
+                symptoms and hospitalisation.')
+        if np.sum(dItoH) != 1:
+            raise ValueError('Distribution of delays between onset of\
+                symptoms and hospitalisation must be normalised.')
+        for _ in pItoH:
+            if not isinstance(_, (int, float)):
+                raise TypeError('Delays between onset of symptoms and \
+                    hospitalisation must be integer or float.')
+            if (_ < 0) or (_ > 1):
+                raise ValueError('Delays between onset of symptoms and \
+                    hospitalisation must be => 0 and <=1.')
 
-    def new_deaths(self, new_infection_outcomes, eta_d, l_d):
+    def new_deaths(self, new_hospitalisation, pHtoD, dHtoD):
         """
-        Computes number of new deathss at each time step in
-        specified region, given the simulated timeline of infection outcomes,
-        for all age groups in the model.
+        Computes number of new deaths at each time step in
+        specified region, given the simulated timeline of hospitalised
+        number of individuals, for all age groups in the model.
 
-        It uses the array of the number of new infection outcomes, obtained
+        It uses the array of the number of new symptomatic infections, obtained
         from an output of the simulation method for the WarwickLancSEIRModel,
-        the delay between onset of symptoms and dying, as well as
-        the fraction of the number of infection outcomes that end up dying.
+        a distribution of the delay between onset of symptoms and
+        admission to ICU, as well as the fraction of the number of hospitalised
+        cases that end up dying.
 
         Parameters
         ----------
-        new_infection_outcomes : numpy.array
-            Age-structured array of the daily number of new infection outcomes.
-        eta_d : list
-            Age-dependent fractions of the number of infection outcomes that
-            end up dying.
-        l_d : int or float
-            Delay between onset of symptoms and dying.
+        new_hospitalisation : list of numpy.array
+            Age-structured arrays of the daily number of new hospitalised
+            cases for different vaccination statuses (unvaccinated, fully-
+            vaccinated, boosted, partially-waned, fully-waned, previous-variant
+            immunity).
+        pHtoD : int or float
+            Age-dependent fractions of the number of hospitalised cases that
+            die.
+        dHtoD : list
+            Distribution of the delay between onset of hospitalisation and
+            death. Must be normalised.
 
         Returns
         -------
-        nunmpy.array
-            Age-structured matrix of the number of new deaths.
+        list of numpy.array
+            Age-structured matrices of the number of new deaths
+            for different vaccination statuses (unvaccinated, fully-vaccinated,
+            boosted, partially-waned, fully-waned, previous-variant immunity)
+            from the simulation method for the WarwickLancSEIRModel.
 
         Notes
         -----
@@ -1292,90 +1234,142 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         one.
 
         """
-        n_daily_deaths = np.zeros((self._times.shape[0], self._num_ages))
-        n_daily_deaths_F = np.zeros((self._times.shape[0], self._num_ages))
-        n_daily_deaths_B = np.zeros((self._times.shape[0], self._num_ages))
-        n_daily_deaths_W1 = np.zeros((self._times.shape[0], self._num_ages))
-        n_daily_deaths_W2 = np.zeros((self._times.shape[0], self._num_ages))
-        n_daily_deaths_W3 = np.zeros((self._times.shape[0], self._num_ages))
+        # Read parameters of the system
+        nu_sev_d = self.vaccine_param[6]
+
+        n_daily_dths = np.zeros((self._times.shape[0], self._num_ages))
+        n_daily_dths_F = np.zeros((self._times.shape[0], self._num_ages))
+        n_daily_dths_B = np.zeros((self._times.shape[0], self._num_ages))
+        n_daily_dths_W1 = np.zeros((self._times.shape[0], self._num_ages))
+        n_daily_dths_W2 = np.zeros((self._times.shape[0], self._num_ages))
+        n_daily_dths_W3 = np.zeros((self._times.shape[0], self._num_ages))
 
         for ind, _ in enumerate(self._times.tolist()):
-            nu_sev = self._nu_sev_all[ind, :]
-            n_daily_deaths[ind + l_d, :] = nu_sev[0] * np.multiply(
-                eta_d, new_infection_outcomes[ind, :])
-            n_daily_deaths_F[ind + l_d, :] = nu_sev[1] * np.multiply(
-                eta_d, new_infection_outcomes[ind, :])
-            n_daily_deaths_B[ind + l_d, :] = nu_sev[2] * np.multiply(
-                eta_d, new_infection_outcomes[ind, :])
-            n_daily_deaths_W1[ind + l_d, :] = nu_sev[3] * np.multiply(
-                eta_d, new_infection_outcomes[ind, :])
-            n_daily_deaths_W2[ind + l_d, :] = nu_sev[4] * np.multiply(
-                eta_d, new_infection_outcomes[ind, :])
-            n_daily_deaths_W3[ind + l_d, :] = nu_sev[5] * np.multiply(
-                eta_d, new_infection_outcomes[ind, :])
+            if ind >= 30:
+                n_daily_dths[ind, :] = nu_sev_d[0] * np.array(pHtoD) * \
+                    np.sum(np.matmul(
+                        np.diag(dHtoD[:31][::-1]),
+                        new_hospitalisation[0][(ind-30):(ind+1), :]), axis=0)
+                n_daily_dths_F[ind, :] = nu_sev_d[1] * np.array(pHtoD) * \
+                    np.sum(np.matmul(
+                        np.diag(dHtoD[:31][::-1]),
+                        new_hospitalisation[1][(ind-30):(ind+1), :]), axis=0)
+                n_daily_dths_B[ind, :] = nu_sev_d[2] * np.array(pHtoD) * \
+                    np.sum(np.matmul(
+                        np.diag(dHtoD[:31][::-1]),
+                        new_hospitalisation[2][(ind-30):(ind+1), :]), axis=0)
+                n_daily_dths_W1[ind, :] = nu_sev_d[3] * np.array(pHtoD) * \
+                    np.sum(np.matmul(
+                        np.diag(dHtoD[:31][::-1]),
+                        new_hospitalisation[3][(ind-30):(ind+1), :]), axis=0)
+                n_daily_dths_W2[ind, :] = nu_sev_d[4] * np.array(pHtoD) * \
+                    np.sum(np.matmul(
+                        np.diag(dHtoD[:31][::-1]),
+                        new_hospitalisation[4][(ind-30):(ind+1), :]), axis=0)
+                n_daily_dths_W3[ind, :] = nu_sev_d[5] * np.array(pHtoD) * \
+                    np.sum(np.matmul(
+                        np.diag(dHtoD[:31][::-1]),
+                        new_hospitalisation[5][(ind-30):(ind+1), :]), axis=0)
+            else:
+                n_daily_dths[ind, :] = nu_sev_d[0] * np.array(pHtoD) * \
+                    np.sum(np.matmul(
+                        np.diag(dHtoD[:(ind+1)][::-1]),
+                        new_hospitalisation[0][:(ind+1), :]), axis=0)
+                n_daily_dths_F[ind, :] = nu_sev_d[1] * np.array(pHtoD) * \
+                    np.sum(np.matmul(
+                        np.diag(dHtoD[:(ind+1)][::-1]),
+                        new_hospitalisation[1][:(ind+1), :]), axis=0)
+                n_daily_dths_B[ind, :] = nu_sev_d[2] * np.array(pHtoD) * \
+                    np.sum(np.matmul(
+                        np.diag(dHtoD[:(ind+1)][::-1]),
+                        new_hospitalisation[2][:(ind+1), :]), axis=0)
+                n_daily_dths_W1[ind, :] = nu_sev_d[3] * np.array(pHtoD) * \
+                    np.sum(np.matmul(
+                        np.diag(dHtoD[:(ind+1)][::-1]),
+                        new_hospitalisation[3][:(ind+1), :]), axis=0)
+                n_daily_dths_W2[ind, :] = nu_sev_d[4] * np.array(pHtoD) * \
+                    np.sum(np.matmul(
+                        np.diag(dHtoD[:(ind+1)][::-1]),
+                        new_hospitalisation[4][:(ind+1), :]), axis=0)
+                n_daily_dths_W3[ind, :] = nu_sev_d[5] * np.array(pHtoD) * \
+                    np.sum(np.matmul(
+                        np.diag(dHtoD[:(ind+1)][::-1]),
+                        new_hospitalisation[5][:(ind+1), :]), axis=0)
 
         for ind, _ in enumerate(self._times.tolist()):  # pragma: no cover
-            if np.any(n_daily_deaths[ind+l_d, :] < 0):
-                n_daily_deaths[ind+l_d, :] = np.zeros_like(
-                    n_daily_deaths[ind+l_d, :])
-            if np.any(n_daily_deaths_F[ind+l_d, :] < 0):
-                n_daily_deaths_F[ind+l_d, :] = np.zeros_like(
-                    n_daily_deaths_F[ind+l_d, :])
-            if np.any(n_daily_deaths_B[ind+l_d, :] < 0):
-                n_daily_deaths_B[ind+l_d, :] = np.zeros_like(
-                    n_daily_deaths_B[ind+l_d, :])
-            if np.any(n_daily_deaths_W1[ind+l_d, :] < 0):
-                n_daily_deaths_W1[ind+l_d, :] = np.zeros_like(
-                    n_daily_deaths_W1[ind+l_d, :])
-            if np.any(n_daily_deaths_W2[ind+l_d, :] < 0):
-                n_daily_deaths_W2[ind+l_d, :] = np.zeros_like(
-                    n_daily_deaths_W2[ind+l_d, :])
-            if np.any(n_daily_deaths_W3[ind+l_d, :] < 0):
-                n_daily_deaths_W3[ind+l_d, :] = np.zeros_like(
-                    n_daily_deaths_W3[ind+l_d, :])
+            if np.any(n_daily_dths[ind, :] < 0):
+                n_daily_dths[ind, :] = np.zeros_like(n_daily_dths[ind, :])
+            if np.any(n_daily_dths_F[ind, :] < 0):
+                n_daily_dths_F[ind, :] = np.zeros_like(n_daily_dths_F[ind, :])
+            if np.any(n_daily_dths_B[ind, :] < 0):
+                n_daily_dths_B[ind, :] = np.zeros_like(n_daily_dths_B[ind, :])
+            if np.any(n_daily_dths_W1[ind, :] < 0):
+                n_daily_dths_W1[ind, :] = np.zeros_like(
+                    n_daily_dths_W1[ind, :])
+            if np.any(n_daily_dths_W2[ind, :] < 0):
+                n_daily_dths_W2[ind, :] = np.zeros_like(
+                    n_daily_dths_W2[ind, :])
+            if np.any(n_daily_dths[ind, :] < 0):
+                n_daily_dths_W3[ind, :] = np.zeros_like(
+                    n_daily_dths_W3[ind, :])
 
-        return (
-            n_daily_deaths, n_daily_deaths_F, n_daily_deaths_B,
-            n_daily_deaths_W1, n_daily_deaths_W2, n_daily_deaths_W3)
+        return [
+            n_daily_dths, n_daily_dths_F, n_daily_dths_B,
+            n_daily_dths_W1, n_daily_dths_W2, n_daily_dths_W3]
 
-    def check_new_deaths_format(
-            self, new_infection_outcomes, eta_d, l_d):
+    def check_new_total_deaths_format(
+            self, new_hospitalisation, pHtoD, dHtoD):
         """
-        Checks correct format of the inputs of number of deaths calculation.
+        Checks correct format of the inputs of number of death
+        calculation.
 
         Parameters
         ----------
-        new_infection_outcomes : numpy.array
-            Age-structured array of the daily number of new infection outcomes.
-        eta_d : list
-            Age-dependent fractions of the number of infection outcomes that
-            end up dying.
-        l_d : int or float
-            Delay between onset of symptoms and dying.
+        new_hospitalisation : numpy.array
+            Age-structured arrays of the daily number of new hospitalised
+            cases for different vaccination statuses (unvaccinated, fully-
+            vaccinated, boosted, partially-waned, fully-waned, previous-variant
+            immunity).
+        pHtoD : int or float
+            Age-dependent fractions of the number of hospitalised cases that
+            die.
+        dHtoD : list
+            Distribution of the delay between onset of hospitalisation and
+            death. Must be normalised.
 
         """
-        self._check_new_infection_outcomes_format(new_infection_outcomes)
+        self._check_new_infections_format(new_hospitalisation)
 
-        if np.asarray(eta_d).ndim != 1:
-            raise ValueError('Fractions of the number of infection outcomes \
-                that end up dying storage format is 1-dimensional.')
-        if np.asarray(eta_d).shape[0] != self._num_ages:
+        if np.asarray(pHtoD).ndim != 1:
+            raise ValueError('Fraction of the number of deaths \
+                from hospitalised cases storage format is 1-dimensional.')
+        if np.asarray(pHtoD).shape[0] != self._num_ages:
             raise ValueError('Wrong number of fractions of the number of\
-                infection outcomes that end up dying.')
-        for _ in eta_d:
+                deaths from hospitalised cases.')
+        for _ in pHtoD:
             if not isinstance(_, (int, float)):
-                raise TypeError('Fractions of the number of infection outcomes\
-                    that end up dying must be integer or float.')
+                raise TypeError('Fraction of the number of deaths \
+                from hospitalised cases must be integer or float.')
             if (_ < 0) or (_ > 1):
-                raise ValueError('Fractions of the number of infection\
-                    outcomes that end up dying must be => 0 and <=1.')
+                raise ValueError('Fraction of the number of deaths \
+                from hospitalised cases must be => 0 and <=1.')
 
-        if not isinstance(l_d, (int, float)):
-            raise TypeError('Delay between onset of symptoms and \
-                dying must be integer or float.')
-        if (l_d < 0):
-            raise ValueError('Delay between onset of symptoms and \
-                dying must be => 0.')
+        if np.asarray(dHtoD).ndim != 1:
+            raise ValueError('Delays between hospital admission and \
+                death storage format is 1-dimensional.')
+        if np.asarray(dHtoD).shape[0] != len(self._times):
+            raise ValueError('Wrong number of delays between hospital \
+                admission and death.')
+        if np.sum(dHtoD) != 1:
+            raise ValueError('Distribution of delays between hospital \
+                admission and death must be normalised.')
+        for _ in dHtoD:
+            if not isinstance(_, (int, float)):
+                raise TypeError('Delays between  hospital \
+                    admission and death must be integer or float.')
+            if (_ < 0) or (_ > 1):
+                raise ValueError('Delays between  hospital \
+                    admission and death must be => 0 and <=1.')
 
     def loglik_deaths(self, obs_death, new_deaths, niu, k):
         r"""
@@ -1456,9 +1450,11 @@ class WarwickLancSEIRModel(pints.ForwardModel):
 
         Parameters
         ----------
-        new_deaths : numpy.array
-            Age-structured matrix of the number of new deaths from the
-            simulation method for the WarwickLancSEIRModel.
+        new_deaths : list of numpy.array
+            Age-structured matrices of the number of new deaths from the
+            simulation method for the WarwickLancSEIRModel for different
+            vaccination statuses (unvaccinated, fully-vaccinated,
+            boosted, partially-waned, fully-waned, previous-variant immunity).
         niu : float
             Dispersion factor for the negative binomial distribution.
 
@@ -1480,8 +1476,10 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             Index of day for which we intend to sample the number of deaths for
             by age group.
         new_deaths : numpy.array
-            Age-structured matrix of the number of new deaths from the
-            simulation method for the WarwickLancSEIRModel.
+            Age-structured matrices of the number of new deaths from the
+            simulation method for the WarwickLancSEIRModel for different
+            vaccination statuses (unvaccinated, fully-vaccinated,
+            boosted, partially-waned, fully-waned, previous-variant immunity).
 
         Returns
         -------
@@ -1511,8 +1509,10 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         Parameters
         ----------
         new_deaths : numpy.array
-            Age-structured matrix of the number of new deaths from the
-            simulation method for the WarwickLancSEIRModel.
+            Age-structured matrices of the number of new deaths from the
+            simulation method for the WarwickLancSEIRModel for different
+            vaccination statuses (unvaccinated, fully-vaccinated,
+            boosted, partially-waned, fully-waned, previous-variant immunity).
         niu : float
             Dispersion factor for the negative binomial distribution.
         k : int

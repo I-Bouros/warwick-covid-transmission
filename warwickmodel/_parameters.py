@@ -674,11 +674,17 @@ class SimParameters(object):
 
     Parameters
     ----------
-    method: str
+    method : str
         The type of solver implemented by the simulator.
+    times : list
+        List of time points at which we wish to evaluate the ODEs
+        system.
+    eps : boolean
+        Indicator parameter for deploying boosters to the recovered
+        compartment.
 
     """
-    def __init__(self, model, method):
+    def __init__(self, model, method, times, eps=False):
         super(SimParameters, self).__init__()
 
         # Set model
@@ -689,12 +695,14 @@ class SimParameters(object):
         self.model = model
 
         # Check inputs format
-        self._check_parameters_input(method)
+        self._check_parameters_input(method, times, eps)
 
         # Set other simulation parameters
         self.method = method
+        self.times = times
+        self.eps = eps
 
-    def _check_parameters_input(self, method):
+    def _check_parameters_input(self, method, times, eps):
         """
         Check correct format of the simulation method's parameters input.
 
@@ -702,14 +710,35 @@ class SimParameters(object):
         ----------
         method: str
             The type of solver implemented by the simulator.
+        times : list
+            List of time points at which we wish to evaluate the ODEs
+            system.
+        eps : boolean
+            Indicator parameter for deploying boosters to the recovered
+            compartment.
 
         """
+        # Check times format
+        if not isinstance(times, list):
+            raise TypeError('Time points of evaluation must be given in a list\
+                format.')
+        for _ in times:
+            if not isinstance(_, (int, float)):
+                raise TypeError('Time points of evaluation must be integer or \
+                    float.')
+            if _ <= 0:
+                raise ValueError('Time points of evaluation must be > 0.')
+
         if not isinstance(method, str):
             raise TypeError('Simulation method must be a string.')
         if method not in (
                 'RK45', 'RK23', 'Radau',
                 'BDF', 'LSODA', 'DOP853'):
             raise ValueError('Simulation method not available.')
+
+        if not isinstance(eps, bool):
+            raise TypeError('Indicator parameter for deploying boosters to \
+                the recovered compartment must be a boolean.')
 
     def __call__(self):
         """
@@ -723,7 +752,7 @@ class SimParameters(object):
             :class:`WarwickLancSEIRModel` the class relates to.
 
         """
-        return self.method
+        return [self.method, self.eps]
 
 #
 # SocDistParameters Class
@@ -826,40 +855,31 @@ class VaccineParameters(object):
         Country-specific vaccination rate of the susceptible population.
     vacb : int or float or list
         Country-specific booster vaccination rate.
-    w : list of lists
-        Timeline of the levels of available vaccine for different
-        countries.
-    niu : 3D np.array
-        Timeline of the levels of the decaying efficacy parameter for
-        different vaccination statuses (unvaccinated, fully-vaccinated,
-        boosted, partially-waned, fully-waned, previous-variant immunity)
-        and different targeted effects (transmission, symptom development,
-        infectiousness, severe outcomes).
-    nu_tra : list
+    nu_tra : int or float or list
         Vaccine effects on transmission for different vaccination statuses
         (unvaccinated, fully-vaccinated, boosted, partially-waned,
         fully-waned, previous-variant immunity).
-    nu_symp : list
+    nu_symp : int or float or list
         Vaccine effects on symptom development for different vaccination
         statuses (unvaccinated, fully-vaccinated, boosted, partially-waned,
         fully-waned, previous-variant immunity).
-    nu_inf : list
+    nu_inf : int or float or list
         Vaccine effects on infectiousness for different vaccination
         statuses (unvaccinated, fully-vaccinated, boosted, partially-waned,
         fully-waned, previous-variant immunity).
-    nu_sev : list
-        Vaccine effects on severe outcomes for different vaccination
+    nu_sev_h : int or float or list
+        Vaccine effects on hospitalised severe outcomes for different
+        vaccination statuses (unvaccinated, fully-vaccinated, boosted,
+        partially-waned, fully-waned, previous-variant immunity).
+    nu_sev_d : int or float or list
+        Vaccine effects on dead severe outcomes for different vaccination
         statuses (unvaccinated, fully-vaccinated, boosted, partially-waned,
         fully-waned, previous-variant immunity).
-    times : list
-        List of time points at which we wish to evaluate the ODEs
-        system.
 
     """
-    # def __init__(self, model, vac, vacb, w, niu, times):
     def __init__(
-            self, model, vac, vacb, nu_tra, nu_symp, nu_inf, nu_sev,
-            times):
+            self, model, vac, vacb, nu_tra, nu_symp, nu_inf, nu_sev_h,
+            nu_sev_d):
         super(VaccineParameters, self).__init__()
 
         # Set model
@@ -870,9 +890,8 @@ class VaccineParameters(object):
         self.model = model
 
         # Check inputs format
-        # self._check_parameters_input(vac, vacb, w, niu, times)
         self._check_parameters_input(
-            vac, vacb, nu_tra, nu_symp, nu_inf, nu_sev, times)
+            vac, vacb, nu_tra, nu_symp, nu_inf, nu_sev_h, nu_sev_d)
 
         # Set vaccination parameters
         if isinstance(vac, (float, int)):
@@ -885,18 +904,33 @@ class VaccineParameters(object):
         else:
             self.vacb = vacb
 
-        # self.w = w
-        # self.niu = niu
+        if isinstance(nu_tra, (float, int)):
+            self.nu_tra = nu_tra * np.ones(6)
+        else:
+            self.nu_tra = nu_tra
 
-        self.nu_tra = nu_tra
-        self.nu_symp = nu_symp
-        self.nu_inf = nu_inf
-        self.nu_sev = nu_sev
-        self.times = times
+        if isinstance(nu_symp, (float, int)):
+            self.nu_symp = nu_symp * np.ones(6)
+        else:
+            self.nu_symp = nu_symp
 
-    # def _check_parameters_input(self, vac, vacb, w, niu, times):
+        if isinstance(nu_inf, (float, int)):
+            self.nu_inf = nu_inf * np.ones(6)
+        else:
+            self.nu_inf = nu_inf
+
+        if isinstance(nu_sev_h, (float, int)):
+            self.nu_sev_h = nu_sev_h * np.ones(6)
+        else:
+            self.nu_sev_h = nu_sev_h
+
+        if isinstance(nu_sev_d, (float, int)):
+            self.nu_sev_d = nu_sev_d * np.ones(6)
+        else:
+            self.nu_sev_d = nu_sev_d
+
     def _check_parameters_input(
-            self, vac, vacb, nu_tra, nu_symp, nu_inf, nu_sev, times):
+            self, vac, vacb, nu_tra, nu_symp, nu_inf, nu_sev_h, nu_sev_d):
         """
         Check correct format of the vaccination-specific parameters input.
 
@@ -906,34 +940,26 @@ class VaccineParameters(object):
             Country-specific vaccination rate of the susceptible population.
         vacb : int or float or list
             Country-specific booster vaccination rate.
-        w : list of lists
-            Timeline of the levels of available vaccine for different
-            countries.
-        niu : 3D np.array
-            Timeline of the levels of the decaying efficacy parameter for
-            different vaccination statuses (unvaccinated, fully-vaccinated,
-            boosted, partially-waned, fully-waned, previous-variant immunity)
-            and different targeted effects (transmission, symptom development,
-            infectiousness, severe outcomes).
-        nu_tra : list
+        nu_tra : int or float or list
             Vaccine effects on transmission for different vaccination statuses
             (unvaccinated, fully-vaccinated, boosted, partially-waned,
             fully-waned, previous-variant immunity).
-        nu_symp : list
+        nu_symp : int or float or list
             Vaccine effects on symptom development for different vaccination
             statuses (unvaccinated, fully-vaccinated, boosted, partially-waned,
             fully-waned, previous-variant immunity).
-        nu_inf : list
+        nu_inf : int or float or list
             Vaccine effects on infectiousness for different vaccination
             statuses (unvaccinated, fully-vaccinated, boosted, partially-waned,
             fully-waned, previous-variant immunity).
-        nu_sev : list
-            Vaccine effects on severe outcomes for different vaccination
+        nu_sev_h : int or float or list
+            Vaccine effects on hospitalised severe outcomes for different
+            vaccination statuses (unvaccinated, fully-vaccinated, boosted,
+            partially-waned, fully-waned, previous-variant immunity).
+        nu_sev_d : int or float or list
+            Vaccine effects on dead severe outcomes for different vaccination
             statuses (unvaccinated, fully-vaccinated, boosted, partially-waned,
             fully-waned, previous-variant immunity).
-        times : list
-            List of time points at which we wish to evaluate the ODEs
-            system.
 
         """
         if isinstance(vac, (float, int)):
@@ -972,69 +998,13 @@ class VaccineParameters(object):
                 raise ValueError('The country-specific booster vaccination \
                     rate must be => 0.')
 
-        # Check times format
-        if not isinstance(times, list):
-            raise TypeError('Time points of evaluation must be given in a list\
-                format.')
-        for _ in times:
-            if not isinstance(_, (int, float)):
-                raise TypeError('Time points of evaluation must be integer or \
-                    float.')
-            if _ <= 0:
-                raise ValueError('Time points of evaluation must be > 0.')
-
-        # if np.asarray(w).ndim != 2:
-        #     raise ValueError(
-        #         'Timeline of the levels of available vaccine for different \
-        #          countries storage format must be 2-dimensional.')
-        # if np.asarray(w).shape[0] != len(self.model.regions):
-        #     raise ValueError(
-        #             'Wrong number of regions in the timeline of the levels\
-        #              of available vaccine for different countries.')
-        # if np.asarray(w).shape[1] != np.asarray(times).shape[0]:
-        #     raise ValueError(
-        #             'Wrong number of timepoints in the timeline of the
-        #              levels of available vaccine for different countries.')
-        # for w_r in np.asarray(w):
-        #     for _ in w_r:
-        #         if not isinstance(_, (np.integer, np.floating)):
-        #             raise TypeError(
-        #                 'Levels of available vaccine must be integer or \
-        #                  float.')
-
-        # if np.asarray(niu).ndim != 3:
-        #     raise ValueError(
-        #         'Timeline of the levels of the decaying efficacy parameter \
-        #          for different vaccination statuses and different targeted \
-        #          effects storage format must be 3-dimensional.')
-        # if np.asarray(niu).shape[0] != np.asarray(times).shape[0]:
-        #     raise ValueError(
-        #             'Wrong number of timepoints in the timeline of the
-        #              levels of the decaying efficacy parameter.')
-        # if np.asarray(niu).shape[1] != 4:
-        #     raise ValueError(
-        #             'Wrong number of targeted effects in the timeline of the\
-        #              levels of the decaying efficacy parameter: transmission\
-        #              , symptom development, infectiousness, severe outcomes\
-        #              .')
-        # if np.asarray(niu).shape[2] != 6:
-        #     raise ValueError(
-        #             'Wrong number of vaccination statuses in the timeline of\
-        #              the levels of the decaying efficacy parameter: \
-        #              unvaccinated, fully-vaccinated, boosted, partially-\
-        #              waned, fully-waned, previous-variant immunity.')
-        # for niu_t in np.asarray(niu):
-        #     for niu_t_ef in niu_t:
-        #         for _ in niu_t_ef:
-        #             if not isinstance(_, (np.integer, np.floating)):
-        #                 raise TypeError(
-        #                     'Levels of the decaying efficacy must be integer\
-        #                      or float.')
-
+        if isinstance(nu_tra, (float, int)):
+            nu_tra = [nu_tra]
         if np.asarray(nu_tra).ndim != 1:
             raise ValueError('Vaccine effects on transmission for different \
                 vaccination statuses storage format must be 1-dimensional.')
-        if np.asarray(nu_tra).shape[0] != 6:
+        if (np.asarray(nu_tra).shape[0] != 6) and (
+                np.asarray(nu_tra).shape[0] != 1):
             raise ValueError(
                     'Wrong number of regions for the vaccine effects on \
                      transmission for different vaccination statuses.')
@@ -1046,11 +1016,14 @@ class VaccineParameters(object):
                 raise ValueError('Vaccine effects on transmission for \
                     different vaccination statuses must be => 0.')
 
+        if isinstance(nu_symp, (float, int)):
+            nu_symp = [nu_symp]
         if np.asarray(nu_symp).ndim != 1:
             raise ValueError('Vaccine effects on symptom development for \
                 different vaccination statuses storage format must be \
                 1-dimensional.')
-        if np.asarray(nu_symp).shape[0] != 6:
+        if (np.asarray(nu_symp).shape[0] != 6) and (
+                np.asarray(nu_symp).shape[0] != 1):
             raise ValueError(
                     'Wrong number of regions for the vaccine effects on \
                      symptom development for different vaccination statuses.')
@@ -1062,10 +1035,13 @@ class VaccineParameters(object):
                 raise ValueError('Vaccine effects on symptom development for \
                     different vaccination statuses must be => 0.')
 
+        if isinstance(nu_inf, (float, int)):
+            nu_inf = [nu_inf]
         if np.asarray(nu_inf).ndim != 1:
             raise ValueError('Vaccine effects on infectiousness for different \
                 vaccination statuses storage format must be 1-dimensional.')
-        if np.asarray(nu_inf).shape[0] != 6:
+        if (np.asarray(nu_inf).shape[0] != 6) and (
+                np.asarray(nu_inf).shape[0] != 1):
             raise ValueError(
                     'Wrong number of regions for the vaccine effects on \
                      infectiousness for different vaccination statuses.')
@@ -1077,19 +1053,44 @@ class VaccineParameters(object):
                 raise ValueError('Vaccine effects on infectiousness for \
                     different vaccination statuses must be => 0.')
 
-        if np.asarray(nu_sev).ndim != 1:
-            raise ValueError('Vaccine effects on severe outcomes for different\
-                vaccination statuses storage format must be 1-dimensional.')
-        if np.asarray(nu_sev).shape[0] != 6:
+        if isinstance(nu_sev_h, (float, int)):
+            nu_sev_h = [nu_sev_h]
+        if np.asarray(nu_sev_h).ndim != 1:
+            raise ValueError('Vaccine effects on hospitalised severe outcomes\
+                 for different vaccination statuses storage format must be \
+                 1-dimensional.')
+        if (np.asarray(nu_sev_h).shape[0] != 6) and (
+                np.asarray(nu_sev_h).shape[0] != 1):
             raise ValueError(
                     'Wrong number of regions for the vaccine effects on \
-                     severe outcomes for different vaccination statuses.')
-        for _ in nu_sev:
+                     hospitalised severe outcomes for different vaccination \
+                     statuses.')
+        for _ in nu_sev_h:
             if not isinstance(_, (float, int)):
-                raise TypeError('Vaccine effects on severe outcomes for \
+                raise TypeError('Vaccine effects on hospitalised severe \
+                    outcomes for different vaccination statuses must be float \
+                    or integer.')
+            if _ < 0:
+                raise ValueError('Vaccine effects on hospitalised severe \
+                    outcomes for different vaccination statuses must be => 0.')
+
+        if isinstance(nu_sev_d, (float, int)):
+            nu_sev_d = [nu_sev_d]
+        if np.asarray(nu_sev_d).ndim != 1:
+            raise ValueError('Vaccine effects on dead severe outcomes for \
+                different vaccination statuses storage format must be \
+                1-dimensional.')
+        if (np.asarray(nu_sev_d).shape[0] != 6) and (
+                np.asarray(nu_sev_d).shape[0] != 1):
+            raise ValueError(
+                    'Wrong number of regions for the vaccine effects on \
+                     dead severe outcomes for different vaccination statuses.')
+        for _ in nu_sev_d:
+            if not isinstance(_, (float, int)):
+                raise TypeError('Vaccine effects on dead severe outcomes for \
                     different vaccination statuses must be float or integer.')
             if _ < 0:
-                raise ValueError('Vaccine effects on severe outcomes for \
+                raise ValueError('Vaccine effects on dead severe outcomes for \
                     different vaccination statuses must be => 0.')
 
     def __call__(self):
@@ -1104,10 +1105,9 @@ class VaccineParameters(object):
             :class:`WarwickLancSEIRModel` the class relates to.
 
         """
-        # return [self.vac, self.vacb, self.w, self.niu]
         return [
             self.vac, self.vacb, self.nu_tra, self.nu_symp,
-            self.nu_inf, self.nu_sev]
+            self.nu_inf, self.nu_sev_h, self.nu_sev_d]
 
 #
 # ParametersController Class
@@ -1301,6 +1301,6 @@ class ParametersController(object):
         parameters.extend(self.disease_parameters())
 
         # Add other simulation parameters
-        parameters.append(self.simulation_parameters())
+        parameters.extend(self.simulation_parameters())
 
         return list(deepflatten(parameters, ignore=str))
