@@ -20,9 +20,6 @@ the PINTS and epimodels python modules.
 # Import version info
 from .version_info import VERSION_INT, VERSION  # noqa
 
-# Import inference submodule
-from . import inference  # noqa
-
 # Import models
 from .model import WarwickLancSEIRModel  # noqa
 
@@ -30,7 +27,10 @@ from .model import WarwickLancSEIRModel  # noqa
 from._parameters import (  # noqa
     ICs,
     RegParameters,
+    Transmission,
     DiseaseParameters,
     SimParameters,
+    VaccineParameters,
+    SocDistParameters,
     ParametersController
 )
