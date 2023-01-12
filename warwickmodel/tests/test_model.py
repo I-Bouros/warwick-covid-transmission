@@ -1,5 +1,5 @@
 #
-# WarwickLancSEIRModel Class
+# WarwickLancWarwickLancSEIRModel Class
 #
 # This file is part of WARWICKMODEL
 # (https://github.com/I-Bouros/warwick-covid-transmission.git) which is
@@ -11,58 +11,82 @@ import unittest
 
 import numpy as np
 import numpy.testing as npt
-from scipy.stats import gamma
 
 import epimodels as em
+import warwickmodel as wm
 
 
-class TestPheSEIRModel(unittest.TestCase):
+class TestWarwickLancSEIRModel(unittest.TestCase):
     """
-    Test the 'PheSEIRModel' class.
+    Test the 'WarwickLancSEIRModel' class.
     """
     def test__init__(self):
-        model = em.PheSEIRModel()
+        model = wm.WarwickLancSEIRModel()
 
         self.assertEqual(
             model._output_names,
-            ['S', 'E1', 'E2', 'I1', 'I2', 'R', 'Incidence'])
+            ['S', 'Sf', 'Sb', 'Sw1', 'Sw2', 'Sw3', 'E1', 'E2', 'E3', 'E4',
+             'E5', 'E1f', 'E2f', 'E3f', 'E4f', 'E5f', 'E1b', 'E2b', 'E3b',
+             'E4b', 'E5b', 'E1w1', 'E2w1', 'E3w1', 'E4w1', 'E5w1', 'E1w2',
+             'E2w2', 'E3w2', 'E4w2', 'E5w2', 'E1w3', 'E2w3', 'E3w3', 'E4w3',
+             'E5w3', 'I', 'If', 'Ib', 'Iw1', 'Iw2', 'Iw3', 'A', 'Sf', 'Ab',
+             'Aw1', 'Aw2', 'Aw3', 'R', 'Incidence'])
         self.assertEqual(
             model._parameter_names,
-            ['S0', 'E10', 'E20', 'I10', 'I20', 'R0', 'beta', 'kappa', 'gamma'])
-        self.assertEqual(model._n_outputs, 7)
-        self.assertEqual(model._n_parameters, 9)
+            ['S0', 'Sf0', 'Sb0', 'Sw10', 'Sw20', 'Sw30', 'E10', 'E20', 'E30',
+             'E40', 'E50', 'E1f0', 'E2f0', 'E3f0', 'E4f0', 'E5f0', 'E1b0',
+             'E2b0', 'E3b0', 'E4b0', 'E5b0', 'E1w10', 'E2w10', 'E3w10',
+             'E4w10', 'E5w10', 'E1w20', 'E2w20', 'E3w20', 'E4w20', 'E5w20',
+             'E1w30', 'E2w30', 'E3w30', 'E4w30', 'E5w30', 'I0', 'If0', 'Ib0',
+             'Iw10', 'Iw20', 'Iw30', 'A0', 'Sf0', 'Ab0', 'Aw10', 'Aw20',
+             'Aw30', 'R0', 'beta', 'alpha', 'gamma', 'd', 'tau', 'we',
+             'omega'])
+        self.assertEqual(model._n_outputs, 50)
+        self.assertEqual(model._n_parameters, 56)
 
     def test_n_outputs(self):
-        model = em.PheSEIRModel()
-        self.assertEqual(model.n_outputs(), 7)
+        model = wm.WarwickLancSEIRModel()
+        self.assertEqual(model.n_outputs(), 50)
 
     def test_n_parameters(self):
-        model = em.PheSEIRModel()
-        self.assertEqual(model.n_parameters(), 9)
+        model = wm.WarwickLancSEIRModel()
+        self.assertEqual(model.n_parameters(), 56)
 
     def test_output_names(self):
-        model = em.PheSEIRModel()
+        model = wm.WarwickLancSEIRModel()
         self.assertEqual(
             model.output_names(),
-            ['S', 'E1', 'E2', 'I1', 'I2', 'R', 'Incidence'])
+            ['S', 'Sf', 'Sb', 'Sw1', 'Sw2', 'Sw3', 'E1', 'E2', 'E3', 'E4',
+             'E5', 'E1f', 'E2f', 'E3f', 'E4f', 'E5f', 'E1b', 'E2b', 'E3b',
+             'E4b', 'E5b', 'E1w1', 'E2w1', 'E3w1', 'E4w1', 'E5w1', 'E1w2',
+             'E2w2', 'E3w2', 'E4w2', 'E5w2', 'E1w3', 'E2w3', 'E3w3', 'E4w3',
+             'E5w3', 'I', 'If', 'Ib', 'Iw1', 'Iw2', 'Iw3', 'A', 'Sf', 'Ab',
+             'Aw1', 'Aw2', 'Aw3', 'R', 'Incidence'])
 
     def test_parameter_names(self):
-        model = em.PheSEIRModel()
+        model = wm.WarwickLancSEIRModel()
         self.assertEqual(
             model.parameter_names(),
-            ['S0', 'E10', 'E20', 'I10', 'I20', 'R0', 'beta', 'kappa', 'gamma'])
+            ['S0', 'Sf0', 'Sb0', 'Sw10', 'Sw20', 'Sw30', 'E10', 'E20', 'E30',
+             'E40', 'E50', 'E1f0', 'E2f0', 'E3f0', 'E4f0', 'E5f0', 'E1b0',
+             'E2b0', 'E3b0', 'E4b0', 'E5b0', 'E1w10', 'E2w10', 'E3w10',
+             'E4w10', 'E5w10', 'E1w20', 'E2w20', 'E3w20', 'E4w20', 'E5w20',
+             'E1w30', 'E2w30', 'E3w30', 'E4w30', 'E5w30', 'I0', 'If0', 'Ib0',
+             'Iw10', 'Iw20', 'Iw30', 'A0', 'Sf0', 'Ab0', 'Aw10', 'Aw20',
+             'Aw30', 'R0', 'beta', 'alpha', 'gamma', 'd', 'tau', 'we',
+             'omega'])
 
     def test_set_regions(self):
-        model = em.PheSEIRModel()
-        regions = ['London', 'Cornwall']
+        model = wm.WarwickLancSEIRModel()
+        regions = ['UK', 'FR']
         model.set_regions(regions)
 
         self.assertEqual(
             model.region_names(),
-            ['London', 'Cornwall'])
+            ['UK', 'FR'])
 
     def test_set_age_groups(self):
-        model = em.PheSEIRModel()
+        model = wm.WarwickLancSEIRModel()
         age_groups = ['0-10', '10-20']
         model.set_age_groups(age_groups)
 
@@ -71,48 +95,39 @@ class TestPheSEIRModel(unittest.TestCase):
             ['0-10', '10-20'])
 
     def test_set_outputs(self):
-        model = em.PheSEIRModel()
-        outputs = ['S', 'I1', 'I2', 'Incidence']
+        model = wm.WarwickLancSEIRModel()
+        outputs = ['S', 'I', 'If', 'Incidence']
         model.set_outputs(outputs)
 
         with self.assertRaises(ValueError):
-            outputs1 = ['S', 'E', 'I1', 'I2', 'Incidence']
+            outputs1 = ['S', 'E', 'I', 'If', 'Incidence']
             model.set_outputs(outputs1)
 
     def test_simulate(self):
-        model = em.PheSEIRModel()
+        model = wm.WarwickLancSEIRModel()
 
         # Populate the model
-        regions = ['London', 'Cornwall']
+        regions = ['UK', 'FR']
         age_groups = ['0-10', '10-25']
 
         # Initial state of the system
-        contact_data_matrix_0 = np.array([[1, 0], [0, 3]])
-        contact_data_matrix_1 = np.array([[10, 5.2], [0, 3]])
+        region_data_matrix_0 = np.array([[1, 10], [1, 6]])
+        region_data_matrix_1 = np.array([[0.5, 3], [0.3, 3]])
 
-        region_data_matrix_0_0 = np.array([[0.5, 0], [0, 6]])
-        region_data_matrix_0_1 = np.array([[1, 10], [1, 0]])
-        region_data_matrix_1_0 = np.array([[0.5, 1.2], [0.29, 6]])
-        region_data_matrix_1_1 = np.array([[0.85, 1], [0.9, 6]])
+        regional_0 = em.RegionMatrix(
+            regions[0], age_groups, region_data_matrix_0)
+        regional_1 = em.RegionMatrix(
+            regions[1], age_groups, region_data_matrix_1)
 
-        contacts_0 = em.ContactMatrix(age_groups, contact_data_matrix_0)
-        contacts_1 = em.ContactMatrix(age_groups, contact_data_matrix_1)
-        regional_0_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_0_0)
-        regional_0_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_0_1)
-        regional_1_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_1_0)
-        regional_1_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_1_1)
+        contacts = em.ContactMatrix(
+            age_groups, np.ones((len(age_groups), len(age_groups))))
+        matrices_contact = [contacts]
 
         # Matrices contact
-        matrices_contact = [contacts_0, contacts_1]
-        time_changes_contact = [1, 3]
-        matrices_region = [
-            [regional_0_0, regional_0_1],
-            [regional_1_0, regional_1_1]]
-        time_changes_region = [1, 2]
+        time_changes_contact = [1]
+        time_changes_region = [1]
+
+        matrices_region = [[regional_0, regional_1]]
 
         model.set_regions(regions)
         model.set_age_groups(age_groups)
@@ -120,111 +135,113 @@ class TestPheSEIRModel(unittest.TestCase):
         model.read_regional_data(matrices_region, time_changes_region)
 
         # Set regional and time dependent parameters
-        regional_parameters = em.PheRegParameters(
+        regional_parameters = wm.RegParameters(
             model=model,
-            initial_r=[0.5, 1],
-            region_index=2,
-            betas=[[1]*2, [1]*2],
-            times=[1, 2]
+            region_index=2
         )
 
         # Set ICs parameters
-        ICs = em.PheICs(
+        ICs_parameters = wm.ICs(
             model=model,
-            susceptibles_IC=[[5, 6], [7, 8]],
-            exposed1_IC=[[0, 0], [0, 0]],
-            exposed2_IC=[[0, 0], [0, 0]],
-            infectives1_IC=[[0, 0], [0, 0]],
-            infectives2_IC=[[0, 0], [0, 0]],
+            susceptibles_IC=[[5, 6] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
             recovered_IC=[[0, 0], [0, 0]]
         )
 
         # Set disease-specific parameters
-        disease_parameters = em.PheDiseaseParameters(
+        disease_parameters = wm.DiseaseParameters(
             model=model,
-            dL=4,
-            dI=4
+            d=0.4 * np.ones(len(age_groups)),
+            tau=0.4,
+            we=[0.02, 0],
+            omega=1
+        )
+
+        # Set transmission parameters
+        transmission_parameters = wm.Transmission(
+            model=model,
+            beta=0.5 * np.ones(len(age_groups)),
+            alpha=0.5,
+            gamma=1 * np.ones(len(age_groups))
         )
 
         # Set other simulation parameters
-        simulation_parameters = em.PheSimParameters(
+        simulation_parameters = wm.SimParameters(
             model=model,
-            delta_t=0.5,
-            method='RK45'
+            method='RK45',
+            times=[1, 2],
+            eps=False
+        )
+
+        # Set vaccination parameters
+        vaccine_parameters = wm.VaccineParameters(
+            model=model,
+            vac=0,
+            vacb=0,
+            nu_tra=[1] * 6,
+            nu_symp=[1] * 6,
+            nu_inf=[1] * 6,
+            nu_sev_h=[1] * 6,
+            nu_sev_d=[1] * 6
+        )
+
+        # Set social distancing parameters
+        soc_dist_parameters = wm.SocDistParameters(
+            model=model,
+            phi=1
         )
 
         # Set all parameters in the controller
-        parameters = em.PheParametersController(
+        parameters = wm.ParametersController(
             model=model,
             regional_parameters=regional_parameters,
-            ICs=ICs,
+            ICs_parameters=ICs_parameters,
             disease_parameters=disease_parameters,
-            simulation_parameters=simulation_parameters
-        )
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
 
         output_my_solver = model.simulate(parameters)
 
         npt.assert_almost_equal(
             output_my_solver,
             np.array([
-                [7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            ]), decimal=3)
-
-        simulation_parameters.method = 'my-solver'
-
-        # Set all parameters in the controller
-        parameters = em.PheParametersController(
-            model=model,
-            regional_parameters=regional_parameters,
-            ICs=ICs,
-            disease_parameters=disease_parameters,
-            simulation_parameters=simulation_parameters
-        )
-
-        output_scipy_solver = model.simulate(parameters)
-
-        npt.assert_almost_equal(
-            output_scipy_solver,
-            np.array([
-                [7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [7, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                [7, 8] + [0, 0] * 49,
+                [7, 8] + [0, 0] * 49
             ]), decimal=3)
 
     def test_new_infections(self):
-        model = em.PheSEIRModel()
+        model = wm.WarwickLancSEIRModel()
 
         # Populate the model
-        regions = ['London', 'Cornwall']
+        regions = ['UK', 'FR']
         age_groups = ['0-10', '10-25']
 
         # Initial state of the system
-        contact_data_matrix_0 = np.array([[1, 0], [0, 3]])
-        contact_data_matrix_1 = np.array([[10, 5.2], [0, 3]])
+        region_data_matrix_0 = np.array([[1, 10], [1, 6]])
+        region_data_matrix_1 = np.array([[0.5, 3], [0.3, 3]])
 
-        region_data_matrix_0_0 = np.array([[0.5, 0], [0, 6]])
-        region_data_matrix_0_1 = np.array([[1, 10], [1, 0]])
-        region_data_matrix_1_0 = np.array([[0.5, 1.2], [0.29, 6]])
-        region_data_matrix_1_1 = np.array([[0.85, 1], [0.9, 6]])
+        regional_0 = em.RegionMatrix(
+            regions[0], age_groups, region_data_matrix_0)
+        regional_1 = em.RegionMatrix(
+            regions[1], age_groups, region_data_matrix_1)
 
-        contacts_0 = em.ContactMatrix(age_groups, contact_data_matrix_0)
-        contacts_1 = em.ContactMatrix(age_groups, contact_data_matrix_1)
-        regional_0_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_0_0)
-        regional_0_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_0_1)
-        regional_1_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_1_0)
-        regional_1_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_1_1)
+        contacts = em.ContactMatrix(
+            age_groups, np.ones((len(age_groups), len(age_groups))))
+        matrices_contact = [contacts]
 
         # Matrices contact
-        matrices_contact = [contacts_0, contacts_1]
-        time_changes_contact = [1, 3]
-        matrices_region = [
-            [regional_0_0, regional_0_1],
-            [regional_1_0, regional_1_1]]
-        time_changes_region = [1, 2]
+        time_changes_contact = [1]
+        time_changes_region = [1]
+
+        matrices_region = [[regional_0, regional_1]]
 
         model.set_regions(regions)
         model.set_age_groups(age_groups)
@@ -232,111 +249,148 @@ class TestPheSEIRModel(unittest.TestCase):
         model.read_regional_data(matrices_region, time_changes_region)
 
         # Set regional and time dependent parameters
-        regional_parameters = em.PheRegParameters(
+        regional_parameters = wm.RegParameters(
             model=model,
-            initial_r=[0.5, 1],
-            region_index=2,
-            betas=[[1]*2, [1]*2],
-            times=[1, 2]
+            region_index=1
         )
 
         # Set ICs parameters
-        ICs = em.PheICs(
+        ICs_parameters = wm.ICs(
             model=model,
-            susceptibles_IC=[[5, 6], [7, 8]],
-            exposed1_IC=[[0, 0], [0, 0]],
-            exposed2_IC=[[0, 0], [0, 0]],
-            infectives1_IC=[[0, 0], [0, 0]],
-            infectives2_IC=[[0, 0], [0, 0]],
+            susceptibles_IC=[[5, 6] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
             recovered_IC=[[0, 0], [0, 0]]
         )
 
         # Set disease-specific parameters
-        disease_parameters = em.PheDiseaseParameters(
+        disease_parameters = wm.DiseaseParameters(
             model=model,
-            dL=4,
-            dI=4
+            d=0.4 * np.ones(len(age_groups)),
+            tau=0.4,
+            we=[0.02, 0],
+            omega=1
+        )
+
+        # Set transmission parameters
+        transmission_parameters = wm.Transmission(
+            model=model,
+            beta=0.5 * np.ones(len(age_groups)),
+            alpha=0.5,
+            gamma=1 * np.ones(len(age_groups))
         )
 
         # Set other simulation parameters
-        simulation_parameters = em.PheSimParameters(
+        simulation_parameters = wm.SimParameters(
             model=model,
-            delta_t=0.5,
-            method='my-solver'
+            method='RK45',
+            times=[1, 2],
+            eps=False
+        )
+
+        # Set vaccination parameters
+        vaccine_parameters = wm.VaccineParameters(
+            model=model,
+            vac=0,
+            vacb=0,
+            nu_tra=[1] * 6,
+            nu_symp=[1] * 6,
+            nu_inf=[1] * 6,
+            nu_sev_h=[1] * 6,
+            nu_sev_d=[1] * 6
+        )
+
+        # Set social distancing parameters
+        soc_dist_parameters = wm.SocDistParameters(
+            model=model,
+            phi=1
         )
 
         # Set all parameters in the controller
-        parameters = em.PheParametersController(
+        parameters = wm.ParametersController(
             model=model,
             regional_parameters=regional_parameters,
-            ICs=ICs,
+            ICs_parameters=ICs_parameters,
             disease_parameters=disease_parameters,
-            simulation_parameters=simulation_parameters
-        )
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
 
         output = model.simulate(parameters)
 
         npt.assert_array_equal(
-            model.new_infections(output),
+            model.new_infections(output)[0],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_infections(output)[1],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_infections(output)[2],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_infections(output)[3],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_infections(output)[4],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_infections(output)[5],
             np.array([[0, 0], [0, 0]]))
 
         with self.assertRaises(ValueError):
-            output1 = np.array([5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+            output1 = np.array([5, 6] + [0, 0] * 49)
             model.new_infections(output1)
 
         with self.assertRaises(ValueError):
             output1 = np.array([
-                [5, 6, 0, 0, 0, 0, 0, 0, 0, 0],
-                [5, 6, 0, 0, 0, 0, 0, 0, 0, 0]])
+                [5, 6] + [0, 0] * 48,
+                [5, 6] + [0, 0] * 48])
             model.new_infections(output1)
 
         with self.assertRaises(ValueError):
             output1 = np.array([
-                [5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+                [5, 6] + [0, 0] * 49,
+                [5, 6] + [0, 0] * 49,
+                [5, 6] + [0, 0] * 49])
             model.new_infections(output1)
 
         with self.assertRaises(TypeError):
             output1 = np.array([
-                ['5', 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [5, 6, '0', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+                ['5', 6] + [0, 0] * 49,
+                [5, 6] + ['0', 0] * 49])
             model.new_infections(output1)
 
-    def test_loglik_deaths(self):
-        model = em.PheSEIRModel()
+    def test_new_hospitalisations(self):
+        model = wm.WarwickLancSEIRModel()
 
         # Populate the model
-        regions = ['London', 'Cornwall']
+        regions = ['UK', 'FR']
         age_groups = ['0-10', '10-25']
 
         # Initial state of the system
-        contact_data_matrix_0 = np.array([[1, 0], [0, 3]])
-        contact_data_matrix_1 = np.array([[10, 5.2], [0, 3]])
+        region_data_matrix_0 = np.array([[1, 10], [1, 6]])
+        region_data_matrix_1 = np.array([[0.5, 3], [0.3, 3]])
 
-        region_data_matrix_0_0 = np.array([[0.5, 0], [0, 6]])
-        region_data_matrix_0_1 = np.array([[1, 10], [1, 0]])
-        region_data_matrix_1_0 = np.array([[0.5, 1.2], [0.29, 6]])
-        region_data_matrix_1_1 = np.array([[0.85, 1], [0.9, 6]])
+        regional_0 = em.RegionMatrix(
+            regions[0], age_groups, region_data_matrix_0)
+        regional_1 = em.RegionMatrix(
+            regions[1], age_groups, region_data_matrix_1)
 
-        contacts_0 = em.ContactMatrix(age_groups, contact_data_matrix_0)
-        contacts_1 = em.ContactMatrix(age_groups, contact_data_matrix_1)
-        regional_0_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_0_0)
-        regional_0_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_0_1)
-        regional_1_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_1_0)
-        regional_1_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_1_1)
+        contacts = em.ContactMatrix(
+            age_groups, np.ones((len(age_groups), len(age_groups))))
+        matrices_contact = [contacts]
 
         # Matrices contact
-        matrices_contact = [contacts_0, contacts_1]
-        time_changes_contact = [1, 3]
-        matrices_region = [
-            [regional_0_0, regional_0_1],
-            [regional_1_0, regional_1_1]]
-        time_changes_region = [1, 2]
+        time_changes_contact = [1]
+        time_changes_region = [1]
+
+        matrices_region = [[regional_0, regional_1]]
 
         model.set_regions(regions)
         model.set_age_groups(age_groups)
@@ -344,137 +398,882 @@ class TestPheSEIRModel(unittest.TestCase):
         model.read_regional_data(matrices_region, time_changes_region)
 
         # Set regional and time dependent parameters
-        regional_parameters = em.PheRegParameters(
+        regional_parameters = wm.RegParameters(
             model=model,
-            initial_r=[0.5, 1],
-            region_index=2,
-            betas=[[1]*2, [1]*2],
-            times=[1, 2]
+            region_index=1
         )
 
         # Set ICs parameters
-        ICs = em.PheICs(
+        ICs_parameters = wm.ICs(
             model=model,
-            susceptibles_IC=[[5, 6], [7, 8]],
-            exposed1_IC=[[0, 0], [0, 0]],
-            exposed2_IC=[[0, 0], [0, 0]],
-            infectives1_IC=[[0, 0], [0, 0]],
-            infectives2_IC=[[0, 0], [0, 0]],
+            susceptibles_IC=[[5, 6] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
             recovered_IC=[[0, 0], [0, 0]]
         )
 
         # Set disease-specific parameters
-        disease_parameters = em.PheDiseaseParameters(
+        disease_parameters = wm.DiseaseParameters(
             model=model,
-            dL=4,
-            dI=4
+            d=0.4 * np.ones(len(age_groups)),
+            tau=0.4,
+            we=[0.02, 0],
+            omega=1
+        )
+
+        # Set transmission parameters
+        transmission_parameters = wm.Transmission(
+            model=model,
+            beta=0.5 * np.ones(len(age_groups)),
+            alpha=0.5,
+            gamma=1 * np.ones(len(age_groups))
         )
 
         # Set other simulation parameters
-        simulation_parameters = em.PheSimParameters(
+        simulation_parameters = wm.SimParameters(
             model=model,
-            delta_t=0.5,
-            method='my-solver'
+            method='RK45',
+            times=[1, 2],
+            eps=False
+        )
+
+        # Set vaccination parameters
+        vaccine_parameters = wm.VaccineParameters(
+            model=model,
+            vac=0,
+            vacb=0,
+            nu_tra=[1] * 6,
+            nu_symp=[1] * 6,
+            nu_inf=[1] * 6,
+            nu_sev_h=[1] * 6,
+            nu_sev_d=[1] * 6
+        )
+
+        # Set social distancing parameters
+        soc_dist_parameters = wm.SocDistParameters(
+            model=model,
+            phi=1
         )
 
         # Set all parameters in the controller
-        parameters = em.PheParametersController(
+        parameters = wm.ParametersController(
             model=model,
             regional_parameters=regional_parameters,
-            ICs=ICs,
+            ICs_parameters=ICs_parameters,
             disease_parameters=disease_parameters,
-            simulation_parameters=simulation_parameters
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
+
+        new_infections = model.new_infections(
+            model.simulate(parameters))
+
+        pItoH = np.ones(len(age_groups))
+        dItoH = np.ones(30)
+
+        npt.assert_array_equal(
+            model.new_hospitalisations(
+                new_infections, pItoH, dItoH)[0],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_hospitalisations(
+                new_infections, pItoH, dItoH)[1],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_hospitalisations(
+                new_infections, pItoH, dItoH)[2],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_hospitalisations(
+                new_infections, pItoH, dItoH)[3],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_hospitalisations(
+                new_infections, pItoH, dItoH)[4],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_hospitalisations(
+                new_infections, pItoH, dItoH)[5],
+            np.array([[0, 0], [0, 0]]))
+
+    def test_check_new_hospitalisations(self):
+        model = wm.WarwickLancSEIRModel()
+
+        # Populate the model
+        regions = ['UK', 'FR']
+        age_groups = ['0-10', '10-25']
+
+        # Initial state of the system
+        region_data_matrix_0 = np.array([[1, 10], [1, 6]])
+        region_data_matrix_1 = np.array([[0.5, 3], [0.3, 3]])
+
+        regional_0 = em.RegionMatrix(
+            regions[0], age_groups, region_data_matrix_0)
+        regional_1 = em.RegionMatrix(
+            regions[1], age_groups, region_data_matrix_1)
+
+        contacts = em.ContactMatrix(
+            age_groups, np.ones((len(age_groups), len(age_groups))))
+        matrices_contact = [contacts]
+
+        # Matrices contact
+        time_changes_contact = [1]
+        time_changes_region = [1]
+
+        matrices_region = [[regional_0, regional_1]]
+
+        model.set_regions(regions)
+        model.set_age_groups(age_groups)
+        model.read_contact_data(matrices_contact, time_changes_contact)
+        model.read_regional_data(matrices_region, time_changes_region)
+
+        # Set regional and time dependent parameters
+        regional_parameters = wm.RegParameters(
+            model=model,
+            region_index=1
         )
 
-        output = model.simulate(parameters)
+        # Set ICs parameters
+        ICs_parameters = wm.ICs(
+            model=model,
+            susceptibles_IC=[[5, 6] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
+            recovered_IC=[[0, 0], [0, 0]]
+        )
 
-        new_infections = model.new_infections(output)
+        # Set disease-specific parameters
+        disease_parameters = wm.DiseaseParameters(
+            model=model,
+            d=0.4 * np.ones(len(age_groups)),
+            tau=0.4,
+            we=[0.02, 0],
+            omega=1
+        )
+
+        # Set transmission parameters
+        transmission_parameters = wm.Transmission(
+            model=model,
+            beta=0.5 * np.ones(len(age_groups)),
+            alpha=0.5,
+            gamma=1 * np.ones(len(age_groups))
+        )
+
+        # Set other simulation parameters
+        simulation_parameters = wm.SimParameters(
+            model=model,
+            method='RK45',
+            times=[1, 2],
+            eps=False
+        )
+
+        # Set vaccination parameters
+        vaccine_parameters = wm.VaccineParameters(
+            model=model,
+            vac=0,
+            vacb=0,
+            nu_tra=[1] * 6,
+            nu_symp=[1] * 6,
+            nu_inf=[1] * 6,
+            nu_sev_h=[1] * 6,
+            nu_sev_d=[1] * 6
+        )
+
+        # Set social distancing parameters
+        soc_dist_parameters = wm.SocDistParameters(
+            model=model,
+            phi=1
+        )
+
+        # Set all parameters in the controller
+        parameters = wm.ParametersController(
+            model=model,
+            regional_parameters=regional_parameters,
+            ICs_parameters=ICs_parameters,
+            disease_parameters=disease_parameters,
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
+
+        new_infections = model.new_infections(
+            model.simulate(parameters))
+
+        pItoH = [1, 1]
+        dItoH = [1] * 30
+
+        with self.assertRaises(ValueError):
+            new_infections1 = np.array([[0, 0], [0, 0]])
+
+            model.check_new_hospitalisation_format(
+                new_infections1, pItoH, dItoH)
+
+        with self.assertRaises(ValueError):
+            new_infections1 = [
+                np.array([[0, 0], [0, 0]]), np.array([[0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0]]), np.array([[0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0]])]
+
+            model.check_new_hospitalisation_format(
+                new_infections1, pItoH, dItoH)
+
+        with self.assertRaises(ValueError):
+            new_infections1 = [
+                np.array([[0, 0], [0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0], [0, 0]])]
+
+            model.check_new_hospitalisation_format(
+                new_infections1, pItoH, dItoH)
+
+        with self.assertRaises(ValueError):
+            new_infections1 = [
+                np.array([[0, 0, 0], [0, 0, 0]]),
+                np.array([[0, 0, 0], [0, 0, 0]]),
+                np.array([[0, 0, 0], [0, 0, 0]]),
+                np.array([[0, 0, 0], [0, 0, 0]]),
+                np.array([[0, 0, 0], [0, 0, 0]]),
+                np.array([[0, 0, 0], [0, 0, 0]])]
+
+            model.check_new_hospitalisation_format(
+                new_infections1, pItoH, dItoH)
+
+        with self.assertRaises(TypeError):
+            new_infections1 = [
+                np.array([[0, '0'], [0, 0]]), np.array([[0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0]]), np.array([[0, 0], [0, 0]]),
+                np.array([[0, 0], [0, '0']]), np.array([[0, 0], [0, 0]])]
+
+            model.check_new_hospitalisation_format(
+                new_infections1, pItoH, dItoH)
+
+        with self.assertRaises(ValueError):
+            pItoH1 = {'0.9': 0}
+
+            model.check_new_hospitalisation_format(
+                new_infections, pItoH1, dItoH)
+
+        with self.assertRaises(ValueError):
+            pItoH1 = [1, 1, 1]
+
+            model.check_new_hospitalisation_format(
+                new_infections, pItoH1, dItoH)
+
+        with self.assertRaises(TypeError):
+            pItoH1 = [1, '1']
+
+            model.check_new_hospitalisation_format(
+                new_infections, pItoH1, dItoH)
+
+        with self.assertRaises(ValueError):
+            pItoH1 = [-0.2, 0.5]
+
+            model.check_new_hospitalisation_format(
+                new_infections, pItoH1, dItoH)
+
+        with self.assertRaises(ValueError):
+            pItoH1 = [0.5, 1.5]
+
+            model.check_new_hospitalisation_format(
+                new_infections, pItoH1, dItoH)
+
+        with self.assertRaises(ValueError):
+            dItoH1 = {'0.9': 0}
+
+            model.check_new_hospitalisation_format(
+                new_infections, pItoH, dItoH1)
+
+        with self.assertRaises(ValueError):
+            dItoH1 = [1, 1, 1]
+
+            model.check_new_hospitalisation_format(
+                new_infections, pItoH, dItoH1)
+
+        with self.assertRaises(TypeError):
+            dItoH1 = [1, '1'] * 17
+
+            model.check_new_hospitalisation_format(
+                new_infections, pItoH, dItoH1)
+
+        with self.assertRaises(ValueError):
+            dItoH1 = [-0.2] + [0.5] * 30
+
+            model.check_new_hospitalisation_format(
+                new_infections, pItoH, dItoH1)
+
+        with self.assertRaises(ValueError):
+            dItoH1 = [0.5] * 30 + [1.5]
+
+            model.check_new_hospitalisation_format(
+                new_infections, pItoH, dItoH1)
+
+    def test_new_deaths(self):
+        model = wm.WarwickLancSEIRModel()
+
+        # Populate the model
+        regions = ['UK', 'FR']
+        age_groups = ['0-10', '10-25']
+
+        # Initial state of the system
+        region_data_matrix_0 = np.array([[1, 10], [1, 6]])
+        region_data_matrix_1 = np.array([[0.5, 3], [0.3, 3]])
+
+        regional_0 = em.RegionMatrix(
+            regions[0], age_groups, region_data_matrix_0)
+        regional_1 = em.RegionMatrix(
+            regions[1], age_groups, region_data_matrix_1)
+
+        contacts = em.ContactMatrix(
+            age_groups, np.ones((len(age_groups), len(age_groups))))
+        matrices_contact = [contacts]
+
+        # Matrices contact
+        time_changes_contact = [1]
+        time_changes_region = [1]
+
+        matrices_region = [[regional_0, regional_1]]
+
+        model.set_regions(regions)
+        model.set_age_groups(age_groups)
+        model.read_contact_data(matrices_contact, time_changes_contact)
+        model.read_regional_data(matrices_region, time_changes_region)
+
+        # Set regional and time dependent parameters
+        regional_parameters = wm.RegParameters(
+            model=model,
+            region_index=1
+        )
+
+        # Set ICs parameters
+        ICs_parameters = wm.ICs(
+            model=model,
+            susceptibles_IC=[[5, 6] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
+            recovered_IC=[[0, 0], [0, 0]]
+        )
+
+        # Set disease-specific parameters
+        disease_parameters = wm.DiseaseParameters(
+            model=model,
+            d=0.4 * np.ones(len(age_groups)),
+            tau=0.4,
+            we=[0.02, 0],
+            omega=1
+        )
+
+        # Set transmission parameters
+        transmission_parameters = wm.Transmission(
+            model=model,
+            beta=0.5 * np.ones(len(age_groups)),
+            alpha=0.5,
+            gamma=1 * np.ones(len(age_groups))
+        )
+
+        # Set other simulation parameters
+        simulation_parameters = wm.SimParameters(
+            model=model,
+            method='RK45',
+            times=[1, 2],
+            eps=False
+        )
+
+        # Set vaccination parameters
+        vaccine_parameters = wm.VaccineParameters(
+            model=model,
+            vac=0,
+            vacb=0,
+            nu_tra=[1] * 6,
+            nu_symp=[1] * 6,
+            nu_inf=[1] * 6,
+            nu_sev_h=[1] * 6,
+            nu_sev_d=[1] * 6
+        )
+
+        # Set social distancing parameters
+        soc_dist_parameters = wm.SocDistParameters(
+            model=model,
+            phi=1
+        )
+
+        # Set all parameters in the controller
+        parameters = wm.ParametersController(
+            model=model,
+            regional_parameters=regional_parameters,
+            ICs_parameters=ICs_parameters,
+            disease_parameters=disease_parameters,
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
+
+        pItoH = [1, 1]
+        dItoH = [1] * 30
+
+        pHtoD = [1, 1]
+        dHtoD = [1] * 30
+
+        new_infections = model.new_infections(
+            model.simulate(parameters))
+
+        new_hospitalisations = model.new_hospitalisations(
+            new_infections, pItoH, dItoH)
+
+        npt.assert_array_equal(
+            model.new_deaths(
+                new_hospitalisations, pHtoD, dHtoD)[0],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_deaths(
+                new_hospitalisations, pHtoD, dHtoD)[1],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_deaths(
+                new_hospitalisations, pHtoD, dHtoD)[2],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_deaths(
+                new_hospitalisations, pHtoD, dHtoD)[3],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_deaths(
+                new_hospitalisations, pHtoD, dHtoD)[4],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_deaths(
+                new_hospitalisations, pHtoD, dHtoD)[5],
+            np.array([[0, 0], [0, 0]]))
+
+    def test_check_new_deaths(self):
+        model = wm.WarwickLancSEIRModel()
+
+        # Populate the model
+        regions = ['UK', 'FR']
+        age_groups = ['0-10', '10-25']
+
+        # Initial state of the system
+        region_data_matrix_0 = np.array([[1, 10], [1, 6]])
+        region_data_matrix_1 = np.array([[0.5, 3], [0.3, 3]])
+
+        regional_0 = em.RegionMatrix(
+            regions[0], age_groups, region_data_matrix_0)
+        regional_1 = em.RegionMatrix(
+            regions[1], age_groups, region_data_matrix_1)
+
+        contacts = em.ContactMatrix(
+            age_groups, np.ones((len(age_groups), len(age_groups))))
+        matrices_contact = [contacts]
+
+        # Matrices contact
+        time_changes_contact = [1]
+        time_changes_region = [1]
+
+        matrices_region = [[regional_0, regional_1]]
+
+        model.set_regions(regions)
+        model.set_age_groups(age_groups)
+        model.read_contact_data(matrices_contact, time_changes_contact)
+        model.read_regional_data(matrices_region, time_changes_region)
+
+        # Set regional and time dependent parameters
+        regional_parameters = wm.RegParameters(
+            model=model,
+            region_index=1
+        )
+
+        # Set ICs parameters
+        ICs_parameters = wm.ICs(
+            model=model,
+            susceptibles_IC=[[5, 6] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
+            recovered_IC=[[0, 0], [0, 0]]
+        )
+
+        # Set disease-specific parameters
+        disease_parameters = wm.DiseaseParameters(
+            model=model,
+            d=0.4 * np.ones(len(age_groups)),
+            tau=0.4,
+            we=[0.02, 0],
+            omega=1
+        )
+
+        # Set transmission parameters
+        transmission_parameters = wm.Transmission(
+            model=model,
+            beta=0.5 * np.ones(len(age_groups)),
+            alpha=0.5,
+            gamma=1 * np.ones(len(age_groups))
+        )
+
+        # Set other simulation parameters
+        simulation_parameters = wm.SimParameters(
+            model=model,
+            method='RK45',
+            times=[1, 2],
+            eps=False
+        )
+
+        # Set vaccination parameters
+        vaccine_parameters = wm.VaccineParameters(
+            model=model,
+            vac=0,
+            vacb=0,
+            nu_tra=[1] * 6,
+            nu_symp=[1] * 6,
+            nu_inf=[1] * 6,
+            nu_sev_h=[1] * 6,
+            nu_sev_d=[1] * 6
+        )
+
+        # Set social distancing parameters
+        soc_dist_parameters = wm.SocDistParameters(
+            model=model,
+            phi=1
+        )
+
+        # Set all parameters in the controller
+        parameters = wm.ParametersController(
+            model=model,
+            regional_parameters=regional_parameters,
+            ICs_parameters=ICs_parameters,
+            disease_parameters=disease_parameters,
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
+
+        pItoH = [1, 1]
+        dItoH = [1] * 30
+
+        pHtoD = [1, 1]
+        dHtoD = [1] * 30
+
+        new_infections = model.new_infections(
+            model.simulate(parameters))
+
+        new_hospitalisations = model.new_hospitalisations(
+            new_infections, pItoH, dItoH)
+
+        with self.assertRaises(ValueError):
+            new_hospitalisations1 = np.array([[0, 0], [0, 0]])
+
+            model.check_new_deaths_format(
+                new_hospitalisations1, pHtoD, dHtoD)
+
+        with self.assertRaises(ValueError):
+            new_hospitalisations1 = [
+                np.array([[0, 0], [0, 0]]), np.array([[0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0]]), np.array([[0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0]])]
+
+            model.check_new_deaths_format(
+                new_hospitalisations1, pHtoD, dHtoD)
+
+        with self.assertRaises(ValueError):
+            new_hospitalisations1 = [
+                np.array([[0, 0], [0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0], [0, 0]])]
+
+            model.check_new_deaths_format(
+                new_hospitalisations1, pHtoD, dHtoD)
+
+        with self.assertRaises(ValueError):
+            new_hospitalisations1 = [
+                np.array([[0, 0, 0], [0, 0, 0]]),
+                np.array([[0, 0, 0], [0, 0, 0]]),
+                np.array([[0, 0, 0], [0, 0, 0]]),
+                np.array([[0, 0, 0], [0, 0, 0]]),
+                np.array([[0, 0, 0], [0, 0, 0]]),
+                np.array([[0, 0, 0], [0, 0, 0]])]
+
+            model.check_new_deaths_format(
+                new_hospitalisations1, pHtoD, dHtoD)
+
+        with self.assertRaises(TypeError):
+            new_hospitalisations1 = [
+                np.array([[0, '0'], [0, 0]]), np.array([[0, 0], [0, 0]]),
+                np.array([[0, 0], [0, 0]]), np.array([[0, 0], [0, 0]]),
+                np.array([[0, 0], [0, '0']]), np.array([[0, 0], [0, 0]])]
+
+            model.check_new_deaths_format(
+                new_hospitalisations1, pHtoD, dHtoD)
+
+        with self.assertRaises(ValueError):
+            pHtoD1 = {'0.9': 0}
+
+            model.check_new_deaths_format(
+                new_hospitalisations, pHtoD1, dHtoD)
+
+        with self.assertRaises(ValueError):
+            pHtoD1 = [1, 1, 1]
+
+            model.check_new_deaths_format(
+                new_hospitalisations, pHtoD1, dHtoD)
+
+        with self.assertRaises(TypeError):
+            pHtoD1 = [1, '1']
+
+            model.check_new_deaths_format(
+                new_hospitalisations, pHtoD1, dHtoD)
+
+        with self.assertRaises(ValueError):
+            pHtoD1 = [-0.2, 0.5]
+
+            model.check_new_deaths_format(
+                new_hospitalisations, pHtoD1, dHtoD)
+
+        with self.assertRaises(ValueError):
+            pHtoD1 = [0.5, 1.5]
+
+            model.check_new_deaths_format(
+                new_hospitalisations, pHtoD1, dHtoD)
+
+        with self.assertRaises(ValueError):
+            dHtoD1 = {'0.9': 0}
+
+            model.check_new_deaths_format(
+                new_hospitalisations, pHtoD, dHtoD1)
+
+        with self.assertRaises(ValueError):
+            dHtoD1 = [1, 1, 1]
+
+            model.check_new_deaths_format(
+                new_hospitalisations, pHtoD, dHtoD1)
+
+        with self.assertRaises(TypeError):
+            dHtoD1 = [1, '1'] * 17
+
+            model.check_new_deaths_format(
+                new_hospitalisations, pHtoD, dHtoD1)
+
+        with self.assertRaises(ValueError):
+            dHtoD1 = [-0.2] + [0.5] * 30
+
+            model.check_new_deaths_format(
+                new_hospitalisations, pHtoD, dHtoD1)
+
+        with self.assertRaises(ValueError):
+            dHtoD1 = [0.5] * 30 + [1.5]
+
+            model.check_new_deaths_format(
+                new_hospitalisations, pHtoD, dHtoD1)
+
+    def test_loglik_deaths(self):
+        model = wm.WarwickLancSEIRModel()
+
+        # Populate the model
+        regions = ['UK', 'FR']
+        age_groups = ['0-10', '10-25']
+
+        # Initial state of the system
+        region_data_matrix_0 = np.array([[1, 10], [1, 6]])
+        region_data_matrix_1 = np.array([[0.5, 3], [0.3, 3]])
+
+        regional_0 = em.RegionMatrix(
+            regions[0], age_groups, region_data_matrix_0)
+        regional_1 = em.RegionMatrix(
+            regions[1], age_groups, region_data_matrix_1)
+
+        contacts = em.ContactMatrix(
+            age_groups, np.ones((len(age_groups), len(age_groups))))
+        matrices_contact = [contacts]
+
+        # Matrices contact
+        time_changes_contact = [1]
+        time_changes_region = [1]
+
+        matrices_region = [[regional_0, regional_1]]
+
+        model.set_regions(regions)
+        model.set_age_groups(age_groups)
+        model.read_contact_data(matrices_contact, time_changes_contact)
+        model.read_regional_data(matrices_region, time_changes_region)
+
+        # Set regional and time dependent parameters
+        regional_parameters = wm.RegParameters(
+            model=model,
+            region_index=2
+        )
+
+        # Set ICs parameters
+        ICs_parameters = wm.ICs(
+            model=model,
+            susceptibles_IC=[[5, 6] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
+            recovered_IC=[[0, 0], [0, 0]]
+        )
+
+        # Set disease-specific parameters
+        disease_parameters = wm.DiseaseParameters(
+            model=model,
+            d=0.4 * np.ones(len(age_groups)),
+            tau=0.4,
+            we=[0.02, 0],
+            omega=1
+        )
+
+        # Set transmission parameters
+        transmission_parameters = wm.Transmission(
+            model=model,
+            beta=0.5 * np.ones(len(age_groups)),
+            alpha=0.5,
+            gamma=1 * np.ones(len(age_groups))
+        )
+
+        # Set other simulation parameters
+        simulation_parameters = wm.SimParameters(
+            model=model,
+            method='RK45',
+            times=[1, 2],
+            eps=False
+        )
+
+        # Set vaccination parameters
+        vaccine_parameters = wm.VaccineParameters(
+            model=model,
+            vac=0,
+            vacb=0,
+            nu_tra=[1] * 6,
+            nu_symp=[1] * 6,
+            nu_inf=[1] * 6,
+            nu_sev_h=[1] * 6,
+            nu_sev_d=[1] * 6
+        )
+
+        # Set social distancing parameters
+        soc_dist_parameters = wm.SocDistParameters(
+            model=model,
+            phi=1
+        )
+
+        # Set all parameters in the controller
+        parameters = wm.ParametersController(
+            model=model,
+            regional_parameters=regional_parameters,
+            ICs_parameters=ICs_parameters,
+            disease_parameters=disease_parameters,
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
+
+        pItoH = [1, 1]
+        dItoH = [1] * 30
+
+        pHtoD = [1, 1]
+        dHtoD = [1] * 30
+
+        new_infections = model.new_infections(
+            model.simulate(parameters))
+
+        new_hospitalisations = model.new_hospitalisations(
+            new_infections, pItoH, dItoH)
+
+        new_deaths = model.new_deaths(
+            new_hospitalisations, pHtoD, dHtoD)
 
         obs_death = [10, 12]
-        fatality_ratio = [0.1, 0.5]
-        time_to_death = [0.5, 0.5]
 
         self.assertEqual(
             model.loglik_deaths(
-                obs_death, new_infections, fatality_ratio,
-                time_to_death, 0.5, 1).shape,
+                obs_death, new_deaths, 0.5, 1).shape,
             (len(age_groups),))
 
         with self.assertRaises(ValueError):
             model.loglik_deaths(
-                obs_death, new_infections, fatality_ratio,
-                time_to_death, 0.5, -1)
+                obs_death, new_deaths, 0.5, -1)
 
         with self.assertRaises(TypeError):
             model.loglik_deaths(
-                obs_death, new_infections, fatality_ratio,
-                time_to_death, 0.5, '1')
+                obs_death, new_deaths, 0.5, '1')
 
         with self.assertRaises(ValueError):
             model.loglik_deaths(
-                obs_death, new_infections, fatality_ratio,
-                time_to_death, 0.5, 2)
+                obs_death, new_deaths, 0.5, 2)
 
         with self.assertRaises(ValueError):
             model.loglik_deaths(
-                0, new_infections, fatality_ratio,
-                time_to_death, 0.5, 1)
+                0, new_deaths, 0.5, 1)
 
         with self.assertRaises(ValueError):
             obs_death1 = np.array([5, 6, 0, 0])
 
             model.loglik_deaths(
-                obs_death1, new_infections, fatality_ratio,
-                time_to_death, 0.5, 1)
+                obs_death1, new_deaths, 0.5, 1)
 
         with self.assertRaises(TypeError):
             obs_death1 = np.array(['5', 6])
 
             model.loglik_deaths(
-                obs_death1, new_infections, fatality_ratio,
-                time_to_death, 0.5, 1)
+                obs_death1, new_deaths, 0.5, 1)
 
         with self.assertRaises(ValueError):
             obs_death1 = np.array([5, -1])
 
             model.loglik_deaths(
-                obs_death1, new_infections, fatality_ratio,
-                time_to_death, 0.5, 1)
+                obs_death1, new_deaths, 0.5, 1)
 
     def test_check_death_format(self):
-        model = em.PheSEIRModel()
+        model = wm.WarwickLancSEIRModel()
 
         # Populate the model
-        regions = ['London', 'Cornwall']
+        regions = ['UK', 'FR']
         age_groups = ['0-10', '10-25']
 
         # Initial state of the system
-        contact_data_matrix_0 = np.array([[1, 0], [0, 3]])
-        contact_data_matrix_1 = np.array([[10, 5.2], [0, 3]])
+        region_data_matrix_0 = np.array([[1, 10], [1, 6]])
+        region_data_matrix_1 = np.array([[0.5, 3], [0.3, 3]])
 
-        region_data_matrix_0_0 = np.array([[0.5, 0], [0, 6]])
-        region_data_matrix_0_1 = np.array([[1, 10], [1, 0]])
-        region_data_matrix_1_0 = np.array([[0.5, 1.2], [0.29, 6]])
-        region_data_matrix_1_1 = np.array([[0.85, 1], [0.9, 6]])
+        regional_0 = em.RegionMatrix(
+            regions[0], age_groups, region_data_matrix_0)
+        regional_1 = em.RegionMatrix(
+            regions[1], age_groups, region_data_matrix_1)
 
-        contacts_0 = em.ContactMatrix(age_groups, contact_data_matrix_0)
-        contacts_1 = em.ContactMatrix(age_groups, contact_data_matrix_1)
-        regional_0_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_0_0)
-        regional_0_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_0_1)
-        regional_1_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_1_0)
-        regional_1_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_1_1)
+        contacts = em.ContactMatrix(
+            age_groups, np.ones((len(age_groups), len(age_groups))))
+        matrices_contact = [contacts]
 
         # Matrices contact
-        matrices_contact = [contacts_0, contacts_1]
-        time_changes_contact = [1, 3]
-        matrices_region = [
-            [regional_0_0, regional_0_1],
-            [regional_1_0, regional_1_1]]
-        time_changes_region = [1, 2]
+        time_changes_contact = [1]
+        time_changes_region = [1]
+
+        matrices_region = [[regional_0, regional_1]]
 
         model.set_regions(regions)
         model.set_age_groups(age_groups)
@@ -482,187 +1281,112 @@ class TestPheSEIRModel(unittest.TestCase):
         model.read_regional_data(matrices_region, time_changes_region)
 
         # Set regional and time dependent parameters
-        regional_parameters = em.PheRegParameters(
+        regional_parameters = wm.RegParameters(
             model=model,
-            initial_r=[0.5, 1],
-            region_index=2,
-            betas=[[1]*2, [1]*2],
-            times=[1, 2]
+            region_index=2
         )
 
         # Set ICs parameters
-        ICs = em.PheICs(
+        ICs_parameters = wm.ICs(
             model=model,
-            susceptibles_IC=[[5, 6], [7, 8]],
-            exposed1_IC=[[0, 0], [0, 0]],
-            exposed2_IC=[[0, 0], [0, 0]],
-            infectives1_IC=[[0, 0], [0, 0]],
-            infectives2_IC=[[0, 0], [0, 0]],
+            susceptibles_IC=[[5, 6] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
             recovered_IC=[[0, 0], [0, 0]]
         )
 
         # Set disease-specific parameters
-        disease_parameters = em.PheDiseaseParameters(
+        disease_parameters = wm.DiseaseParameters(
             model=model,
-            dL=4,
-            dI=4
+            d=0.4 * np.ones(len(age_groups)),
+            tau=0.4,
+            we=[0.02, 0],
+            omega=1
+        )
+
+        # Set transmission parameters
+        transmission_parameters = wm.Transmission(
+            model=model,
+            beta=0.5 * np.ones(len(age_groups)),
+            alpha=0.5,
+            gamma=1 * np.ones(len(age_groups))
         )
 
         # Set other simulation parameters
-        simulation_parameters = em.PheSimParameters(
+        simulation_parameters = wm.SimParameters(
             model=model,
-            delta_t=0.5,
-            method='my-solver'
+            method='RK45',
+            times=[1, 2],
+            eps=False
+        )
+
+        # Set vaccination parameters
+        vaccine_parameters = wm.VaccineParameters(
+            model=model,
+            vac=0,
+            vacb=0,
+            nu_tra=[1] * 6,
+            nu_symp=[1] * 6,
+            nu_inf=[1] * 6,
+            nu_sev_h=[1] * 6,
+            nu_sev_d=[1] * 6
+        )
+
+        # Set social distancing parameters
+        soc_dist_parameters = wm.SocDistParameters(
+            model=model,
+            phi=1
         )
 
         # Set all parameters in the controller
-        parameters = em.PheParametersController(
+        parameters = wm.ParametersController(
             model=model,
             regional_parameters=regional_parameters,
-            ICs=ICs,
+            ICs_parameters=ICs_parameters,
             disease_parameters=disease_parameters,
-            simulation_parameters=simulation_parameters
-        )
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
 
-        output = model.simulate(parameters)
-
-        new_infections = model.new_infections(output)
-
-        fatality_ratio = [0.1, 0.5]
-        time_to_death = [0.5, 0.5]
+        model.simulate(parameters)
 
         with self.assertRaises(TypeError):
-            model.check_death_format(
-                new_infections, fatality_ratio, time_to_death, '0.5')
+            model.check_death_format('0.5')
 
         with self.assertRaises(ValueError):
-            model.check_death_format(
-                new_infections, fatality_ratio, time_to_death, -2)
-
-        with self.assertRaises(ValueError):
-            new_infections1 = \
-                np.array([5, 6])
-
-            model.check_death_format(
-                new_infections1, fatality_ratio, time_to_death, 0.5)
-
-        with self.assertRaises(ValueError):
-            new_infections1 = np.array([
-                [5, 6, 0, 0],
-                [5, 6, 0, 0]])
-
-            model.check_death_format(
-                new_infections1, fatality_ratio, time_to_death, 0.5)
-
-        with self.assertRaises(ValueError):
-            new_infections1 = np.array([
-                [5, 6], [5, 6], [5, 6]])
-
-            model.check_death_format(
-                new_infections1, fatality_ratio, time_to_death, 0.5)
-
-        with self.assertRaises(TypeError):
-            new_infections1 = np.array([
-                ['5', 6],
-                [5, '0']])
-
-            model.check_death_format(
-                new_infections1, fatality_ratio, time_to_death, 0.5)
-
-        with self.assertRaises(ValueError):
-            fatality_ratio1 = 0
-
-            model.check_death_format(
-                new_infections, fatality_ratio1, time_to_death, 0.5)
-
-        with self.assertRaises(ValueError):
-            fatality_ratio1 = np.array([0.1, 0.5, 0.1])
-
-            model.check_death_format(
-                new_infections, fatality_ratio1, time_to_death, 0.5)
-
-        with self.assertRaises(TypeError):
-            fatality_ratio1 = np.array([0.1, '0.5'])
-
-            model.check_death_format(
-                new_infections, fatality_ratio1, time_to_death, 0.5)
-
-        with self.assertRaises(ValueError):
-            fatality_ratio1 = np.array([-0.1, 0.5])
-
-            model.check_death_format(
-                new_infections, fatality_ratio1, time_to_death, 0.5)
-
-        with self.assertRaises(ValueError):
-            fatality_ratio1 = np.array([0.1, 1.5])
-
-            model.check_death_format(
-                new_infections, fatality_ratio1, time_to_death, 0.5)
-
-        with self.assertRaises(ValueError):
-            time_to_death1 = np.array([[0.5], [0.5]])
-
-            model.check_death_format(
-                new_infections, fatality_ratio, time_to_death1, 0.5)
-
-        with self.assertRaises(ValueError):
-            time_to_death1 = np.array([0.5, 0.5, 0.15])
-
-            model.check_death_format(
-                new_infections, fatality_ratio, time_to_death1, 0.5)
-
-        with self.assertRaises(TypeError):
-            time_to_death1 = np.array(['0.1', 0.5])
-
-            model.check_death_format(
-                new_infections, fatality_ratio, time_to_death1, 0.5)
-
-        with self.assertRaises(ValueError):
-            time_to_death1 = np.array([-0.1, 0.5])
-
-            model.check_death_format(
-                new_infections, fatality_ratio, time_to_death1, 0.5)
-
-        with self.assertRaises(ValueError):
-            time_to_death1 = np.array([0.5, 1.1])
-
-            model.check_death_format(
-                new_infections, fatality_ratio, time_to_death1, 0.5)
+            model.check_death_format(-2)
 
     def test_samples_deaths(self):
-        model = em.PheSEIRModel()
+        model = wm.WarwickLancSEIRModel()
 
         # Populate the model
-        regions = ['London', 'Cornwall']
+        regions = ['UK', 'FR']
         age_groups = ['0-10', '10-25']
 
         # Initial state of the system
-        contact_data_matrix_0 = np.array([[1, 0], [0, 3]])
-        contact_data_matrix_1 = np.array([[10, 5.2], [0, 3]])
+        region_data_matrix_0 = np.array([[1, 10], [1, 6]])
+        region_data_matrix_1 = np.array([[0.5, 3], [0.3, 3]])
 
-        region_data_matrix_0_0 = np.array([[0.5, 0], [0, 6]])
-        region_data_matrix_0_1 = np.array([[1, 10], [1, 0]])
-        region_data_matrix_1_0 = np.array([[0.5, 1.2], [0.29, 6]])
-        region_data_matrix_1_1 = np.array([[0.85, 1], [0.9, 6]])
+        regional_0 = em.RegionMatrix(
+            regions[0], age_groups, region_data_matrix_0)
+        regional_1 = em.RegionMatrix(
+            regions[1], age_groups, region_data_matrix_1)
 
-        contacts_0 = em.ContactMatrix(age_groups, contact_data_matrix_0)
-        contacts_1 = em.ContactMatrix(age_groups, contact_data_matrix_1)
-        regional_0_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_0_0)
-        regional_0_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_0_1)
-        regional_1_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_1_0)
-        regional_1_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_1_1)
+        contacts = em.ContactMatrix(
+            age_groups, np.ones((len(age_groups), len(age_groups))))
+        matrices_contact = [contacts]
 
         # Matrices contact
-        matrices_contact = [contacts_0, contacts_1]
-        time_changes_contact = [1, 3]
-        matrices_region = [
-            [regional_0_0, regional_0_1],
-            [regional_1_0, regional_1_1]]
-        time_changes_region = [1, 2]
+        time_changes_contact = [1]
+        time_changes_region = [1]
+
+        matrices_region = [[regional_0, regional_1]]
 
         model.set_regions(regions)
         model.set_age_groups(age_groups)
@@ -670,121 +1394,136 @@ class TestPheSEIRModel(unittest.TestCase):
         model.read_regional_data(matrices_region, time_changes_region)
 
         # Set regional and time dependent parameters
-        regional_parameters = em.PheRegParameters(
+        regional_parameters = wm.RegParameters(
             model=model,
-            initial_r=[0.5, 1],
-            region_index=1,
-            betas=[[1]*60, [1]*60],
-            times=np.arange(1, 61).tolist()
+            region_index=2
         )
 
         # Set ICs parameters
-        ICs = em.PheICs(
+        ICs_parameters = wm.ICs(
             model=model,
-            susceptibles_IC=[[5, 6], [7, 8]],
-            exposed1_IC=[[0, 0], [0, 0]],
-            exposed2_IC=[[0.1, 0.2], [0, 0]],
-            infectives1_IC=[[0, 0], [0, 0]],
-            infectives2_IC=[[0, 0], [0, 0]],
+            susceptibles_IC=[[5, 6] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
             recovered_IC=[[0, 0], [0, 0]]
         )
 
         # Set disease-specific parameters
-        disease_parameters = em.PheDiseaseParameters(
+        disease_parameters = wm.DiseaseParameters(
             model=model,
-            dL=4,
-            dI=4
+            d=0.4 * np.ones(len(age_groups)),
+            tau=0.4,
+            we=[0.02, 0],
+            omega=1
+        )
+
+        # Set transmission parameters
+        transmission_parameters = wm.Transmission(
+            model=model,
+            beta=0.5 * np.ones(len(age_groups)),
+            alpha=0.5,
+            gamma=1 * np.ones(len(age_groups))
         )
 
         # Set other simulation parameters
-        simulation_parameters = em.PheSimParameters(
+        simulation_parameters = wm.SimParameters(
             model=model,
-            delta_t=0.5,
-            method='my-solver'
+            method='RK45',
+            times=np.arange(1, 61).tolist(),
+            eps=False
+        )
+
+        # Set vaccination parameters
+        vaccine_parameters = wm.VaccineParameters(
+            model=model,
+            vac=0,
+            vacb=0,
+            nu_tra=[1] * 6,
+            nu_symp=[1] * 6,
+            nu_inf=[1] * 6,
+            nu_sev_h=[1] * 6,
+            nu_sev_d=[1] * 6
+        )
+
+        # Set social distancing parameters
+        soc_dist_parameters = wm.SocDistParameters(
+            model=model,
+            phi=1
         )
 
         # Set all parameters in the controller
-        parameters = em.PheParametersController(
+        parameters = wm.ParametersController(
             model=model,
             regional_parameters=regional_parameters,
-            ICs=ICs,
+            ICs_parameters=ICs_parameters,
             disease_parameters=disease_parameters,
-            simulation_parameters=simulation_parameters
-        )
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
 
-        output = model.simulate(parameters)
+        pItoH = [1, 1]
+        dItoH = [1] * 30
 
-        new_infections = model.new_infections(output)
+        pHtoD = [1, 1]
+        dHtoD = [1] * 30
 
-        fatality_ratio = [0.1, 0.5]
+        new_infections = model.new_infections(
+            model.simulate(parameters))
 
-        td_mean = 15.0
-        td_var = 12.1**2
-        theta = td_var / td_mean
-        k = td_mean / theta
-        time_to_death = gamma(k, scale=theta).pdf(np.arange(1, 60)).tolist()
+        new_hospitalisations = model.new_hospitalisations(
+            new_infections, pItoH, dItoH)
+
+        new_deaths = model.new_deaths(
+            new_hospitalisations, pHtoD, dHtoD)
 
         self.assertEqual(
-            model.samples_deaths(
-                new_infections, fatality_ratio,
-                time_to_death, 0.5, 41).shape,
+            model.samples_deaths(new_deaths, 0.5, 41).shape,
             (len(age_groups),))
 
         self.assertEqual(
-            model.samples_deaths(
-                new_infections, fatality_ratio,
-                time_to_death, 0.5, 1).shape,
+            model.samples_deaths(new_deaths, 0.5, 1).shape,
             (len(age_groups),))
 
         with self.assertRaises(ValueError):
-            model.samples_deaths(
-                new_infections, fatality_ratio,
-                time_to_death, 0.5, -1)
+            model.samples_deaths(new_deaths, 0.5, -1)
 
         with self.assertRaises(TypeError):
-            model.samples_deaths(
-                new_infections, fatality_ratio,
-                time_to_death, 0.5, '1')
+            model.samples_deaths(new_deaths, 0.5, '1')
 
         with self.assertRaises(ValueError):
-            model.samples_deaths(
-                new_infections, fatality_ratio,
-                time_to_death, 0.5, 62)
+            model.samples_deaths(new_deaths, 0.5, 62)
 
     def test_loglik_positive_tests(self):
-        model = em.PheSEIRModel()
+        model = wm.WarwickLancSEIRModel()
 
         # Populate the model
-        regions = ['London', 'Cornwall']
+        regions = ['UK', 'FR']
         age_groups = ['0-10', '10-25']
 
         # Initial state of the system
-        contact_data_matrix_0 = np.array([[1, 0], [0, 3]])
-        contact_data_matrix_1 = np.array([[10, 5.2], [0, 3]])
+        region_data_matrix_0 = np.array([[1, 10], [1, 6]])
+        region_data_matrix_1 = np.array([[0.5, 3], [0.3, 3]])
 
-        region_data_matrix_0_0 = np.array([[0.5, 0], [0, 6]])
-        region_data_matrix_0_1 = np.array([[1, 10], [1, 0]])
-        region_data_matrix_1_0 = np.array([[0.5, 1.2], [0.29, 6]])
-        region_data_matrix_1_1 = np.array([[0.85, 1], [0.9, 6]])
+        regional_0 = em.RegionMatrix(
+            regions[0], age_groups, region_data_matrix_0)
+        regional_1 = em.RegionMatrix(
+            regions[1], age_groups, region_data_matrix_1)
 
-        contacts_0 = em.ContactMatrix(age_groups, contact_data_matrix_0)
-        contacts_1 = em.ContactMatrix(age_groups, contact_data_matrix_1)
-        regional_0_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_0_0)
-        regional_0_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_0_1)
-        regional_1_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_1_0)
-        regional_1_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_1_1)
+        contacts = em.ContactMatrix(
+            age_groups, np.ones((len(age_groups), len(age_groups))))
+        matrices_contact = [contacts]
 
         # Matrices contact
-        matrices_contact = [contacts_0, contacts_1]
-        time_changes_contact = [1, 3]
-        matrices_region = [
-            [regional_0_0, regional_0_1],
-            [regional_1_0, regional_1_1]]
-        time_changes_region = [1, 2]
+        time_changes_contact = [1]
+        time_changes_region = [1]
+
+        matrices_region = [[regional_0, regional_1]]
 
         model.set_regions(regions)
         model.set_age_groups(age_groups)
@@ -792,47 +1531,78 @@ class TestPheSEIRModel(unittest.TestCase):
         model.read_regional_data(matrices_region, time_changes_region)
 
         # Set regional and time dependent parameters
-        regional_parameters = em.PheRegParameters(
+        regional_parameters = wm.RegParameters(
             model=model,
-            initial_r=[0.5, 1],
-            region_index=2,
-            betas=[[1]*2, [1]*2],
-            times=[1, 2]
+            region_index=2
         )
 
         # Set ICs parameters
-        ICs = em.PheICs(
+        ICs_parameters = wm.ICs(
             model=model,
-            susceptibles_IC=[[5, 6], [7, 8]],
-            exposed1_IC=[[0, 0], [0, 0]],
-            exposed2_IC=[[0, 0], [0, 0]],
-            infectives1_IC=[[0, 0], [0, 0]],
-            infectives2_IC=[[0, 0], [0, 0]],
+            susceptibles_IC=[[5, 6] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
             recovered_IC=[[0, 0], [0, 0]]
         )
 
         # Set disease-specific parameters
-        disease_parameters = em.PheDiseaseParameters(
+        disease_parameters = wm.DiseaseParameters(
             model=model,
-            dL=4,
-            dI=4
+            d=0.4 * np.ones(len(age_groups)),
+            tau=0.4,
+            we=[0.02, 0],
+            omega=1
+        )
+
+        # Set transmission parameters
+        transmission_parameters = wm.Transmission(
+            model=model,
+            beta=0.5 * np.ones(len(age_groups)),
+            alpha=0.5,
+            gamma=1 * np.ones(len(age_groups))
         )
 
         # Set other simulation parameters
-        simulation_parameters = em.PheSimParameters(
+        simulation_parameters = wm.SimParameters(
             model=model,
-            delta_t=0.5,
-            method='my-solver'
+            method='RK45',
+            times=np.arange(1, 61).tolist(),
+            eps=False
+        )
+
+        # Set vaccination parameters
+        vaccine_parameters = wm.VaccineParameters(
+            model=model,
+            vac=0,
+            vacb=0,
+            nu_tra=[1] * 6,
+            nu_symp=[1] * 6,
+            nu_inf=[1] * 6,
+            nu_sev_h=[1] * 6,
+            nu_sev_d=[1] * 6
+        )
+
+        # Set social distancing parameters
+        soc_dist_parameters = wm.SocDistParameters(
+            model=model,
+            phi=1
         )
 
         # Set all parameters in the controller
-        parameters = em.PheParametersController(
+        parameters = wm.ParametersController(
             model=model,
             regional_parameters=regional_parameters,
-            ICs=ICs,
+            ICs_parameters=ICs_parameters,
             disease_parameters=disease_parameters,
-            simulation_parameters=simulation_parameters
-        )
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
 
         output = model.simulate(parameters)
 
@@ -856,7 +1626,7 @@ class TestPheSEIRModel(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             model.loglik_positive_tests(
-                obs_pos, output, tests[0], sens, spec, 3)
+                obs_pos, output, tests[0], sens, spec, 63)
 
         with self.assertRaises(ValueError):
             model.loglik_positive_tests(
@@ -887,39 +1657,30 @@ class TestPheSEIRModel(unittest.TestCase):
                 obs_pos1, output, tests[0], sens, spec, 0)
 
     def test_check_positives_format(self):
-        model = em.PheSEIRModel()
+        model = wm.WarwickLancSEIRModel()
 
         # Populate the model
-        regions = ['London', 'Cornwall']
+        regions = ['UK', 'FR']
         age_groups = ['0-10', '10-25']
 
         # Initial state of the system
-        contact_data_matrix_0 = np.array([[1, 0], [0, 3]])
-        contact_data_matrix_1 = np.array([[10, 5.2], [0, 3]])
+        region_data_matrix_0 = np.array([[1, 10], [1, 6]])
+        region_data_matrix_1 = np.array([[0.5, 3], [0.3, 3]])
 
-        region_data_matrix_0_0 = np.array([[0.5, 0], [0, 6]])
-        region_data_matrix_0_1 = np.array([[1, 10], [1, 0]])
-        region_data_matrix_1_0 = np.array([[0.5, 1.2], [0.29, 6]])
-        region_data_matrix_1_1 = np.array([[0.85, 1], [0.9, 6]])
+        regional_0 = em.RegionMatrix(
+            regions[0], age_groups, region_data_matrix_0)
+        regional_1 = em.RegionMatrix(
+            regions[1], age_groups, region_data_matrix_1)
 
-        contacts_0 = em.ContactMatrix(age_groups, contact_data_matrix_0)
-        contacts_1 = em.ContactMatrix(age_groups, contact_data_matrix_1)
-        regional_0_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_0_0)
-        regional_0_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_0_1)
-        regional_1_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_1_0)
-        regional_1_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_1_1)
+        contacts = em.ContactMatrix(
+            age_groups, np.ones((len(age_groups), len(age_groups))))
+        matrices_contact = [contacts]
 
         # Matrices contact
-        matrices_contact = [contacts_0, contacts_1]
-        time_changes_contact = [1, 3]
-        matrices_region = [
-            [regional_0_0, regional_0_1],
-            [regional_1_0, regional_1_1]]
-        time_changes_region = [1, 2]
+        time_changes_contact = [1]
+        time_changes_region = [1]
+
+        matrices_region = [[regional_0, regional_1]]
 
         model.set_regions(regions)
         model.set_age_groups(age_groups)
@@ -927,47 +1688,78 @@ class TestPheSEIRModel(unittest.TestCase):
         model.read_regional_data(matrices_region, time_changes_region)
 
         # Set regional and time dependent parameters
-        regional_parameters = em.PheRegParameters(
+        regional_parameters = wm.RegParameters(
             model=model,
-            initial_r=[0.5, 1],
-            region_index=2,
-            betas=[[1]*2, [1]*2],
-            times=[1, 2]
+            region_index=1
         )
 
         # Set ICs parameters
-        ICs = em.PheICs(
+        ICs_parameters = wm.ICs(
             model=model,
-            susceptibles_IC=[[5, 6], [7, 8]],
-            exposed1_IC=[[0, 0], [0, 0]],
-            exposed2_IC=[[0, 0], [0, 0]],
-            infectives1_IC=[[0, 0], [0, 0]],
-            infectives2_IC=[[0, 0], [0, 0]],
+            susceptibles_IC=[[5, 6] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
             recovered_IC=[[0, 0], [0, 0]]
         )
 
         # Set disease-specific parameters
-        disease_parameters = em.PheDiseaseParameters(
+        disease_parameters = wm.DiseaseParameters(
             model=model,
-            dL=4,
-            dI=4
+            d=0.4 * np.ones(len(age_groups)),
+            tau=0.4,
+            we=[0.02, 0],
+            omega=1
+        )
+
+        # Set transmission parameters
+        transmission_parameters = wm.Transmission(
+            model=model,
+            beta=0.5 * np.ones(len(age_groups)),
+            alpha=0.5,
+            gamma=1 * np.ones(len(age_groups))
         )
 
         # Set other simulation parameters
-        simulation_parameters = em.PheSimParameters(
+        simulation_parameters = wm.SimParameters(
             model=model,
-            delta_t=0.5,
-            method='my-solver'
+            method='RK45',
+            times=[1, 2],
+            eps=False
+        )
+
+        # Set vaccination parameters
+        vaccine_parameters = wm.VaccineParameters(
+            model=model,
+            vac=0,
+            vacb=0,
+            nu_tra=[1] * 6,
+            nu_symp=[1] * 6,
+            nu_inf=[1] * 6,
+            nu_sev_h=[1] * 6,
+            nu_sev_d=[1] * 6
+        )
+
+        # Set social distancing parameters
+        soc_dist_parameters = wm.SocDistParameters(
+            model=model,
+            phi=1
         )
 
         # Set all parameters in the controller
-        parameters = em.PheParametersController(
+        parameters = wm.ParametersController(
             model=model,
             regional_parameters=regional_parameters,
-            ICs=ICs,
+            ICs_parameters=ICs_parameters,
             disease_parameters=disease_parameters,
-            simulation_parameters=simulation_parameters
-        )
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
 
         output = model.simulate(parameters)
 
@@ -976,32 +1768,32 @@ class TestPheSEIRModel(unittest.TestCase):
         spec = 0.1
 
         with self.assertRaises(ValueError):
-            output1 = np.array([5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+            output1 = np.array([5, 6] + [0, 0] * 49)
 
             model.check_positives_format(
                 output1, tests, sens, spec)
 
         with self.assertRaises(ValueError):
             output1 = np.array([
-                [5, 6, 0, 0, 0, 0, 0, 0, 0, 0],
-                [5, 6, 0, 0, 0, 0, 0, 0, 0, 0]])
+                [5, 6] + [0, 0] * 48,
+                [5, 6] + [0, 0] * 48])
 
             model.check_positives_format(
                 output1, tests, sens, spec)
 
         with self.assertRaises(ValueError):
             output1 = np.array([
-                [5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+                [5, 6] + [0, 0] * 49,
+                [5, 6] + [0, 0] * 49,
+                [5, 6] + [0, 0] * 49])
 
             model.check_positives_format(
                 output1, tests, sens, spec)
 
         with self.assertRaises(TypeError):
             output1 = np.array([
-                ['5', 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [5, 6, '0', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+                [5, 6] + [0, '0'] * 49,
+                [5, '6'] + [0, 0] * 49])
 
             model.check_positives_format(
                 output1, tests, sens, spec)
@@ -1061,39 +1853,30 @@ class TestPheSEIRModel(unittest.TestCase):
                 output, tests, sens, 1.2)
 
     def test_samples_positive_tests(self):
-        model = em.PheSEIRModel()
+        model = wm.WarwickLancSEIRModel()
 
         # Populate the model
-        regions = ['London', 'Cornwall']
+        regions = ['UK', 'FR']
         age_groups = ['0-10', '10-25']
 
         # Initial state of the system
-        contact_data_matrix_0 = np.array([[1, 0], [0, 3]])
-        contact_data_matrix_1 = np.array([[10, 5.2], [0, 3]])
+        region_data_matrix_0 = np.array([[1, 10], [1, 6]])
+        region_data_matrix_1 = np.array([[0.5, 3], [0.3, 3]])
 
-        region_data_matrix_0_0 = np.array([[0.5, 0], [0, 6]])
-        region_data_matrix_0_1 = np.array([[1, 10], [1, 0]])
-        region_data_matrix_1_0 = np.array([[0.5, 1.2], [0.29, 6]])
-        region_data_matrix_1_1 = np.array([[0.85, 1], [0.9, 6]])
+        regional_0 = em.RegionMatrix(
+            regions[0], age_groups, region_data_matrix_0)
+        regional_1 = em.RegionMatrix(
+            regions[1], age_groups, region_data_matrix_1)
 
-        contacts_0 = em.ContactMatrix(age_groups, contact_data_matrix_0)
-        contacts_1 = em.ContactMatrix(age_groups, contact_data_matrix_1)
-        regional_0_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_0_0)
-        regional_0_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_0_1)
-        regional_1_0 = em.RegionMatrix(
-            regions[0], age_groups, region_data_matrix_1_0)
-        regional_1_1 = em.RegionMatrix(
-            regions[1], age_groups, region_data_matrix_1_1)
+        contacts = em.ContactMatrix(
+            age_groups, np.ones((len(age_groups), len(age_groups))))
+        matrices_contact = [contacts]
 
         # Matrices contact
-        matrices_contact = [contacts_0, contacts_1]
-        time_changes_contact = [1, 3]
-        matrices_region = [
-            [regional_0_0, regional_0_1],
-            [regional_1_0, regional_1_1]]
-        time_changes_region = [1, 2]
+        time_changes_contact = [1]
+        time_changes_region = [1]
+
+        matrices_region = [[regional_0, regional_1]]
 
         model.set_regions(regions)
         model.set_age_groups(age_groups)
@@ -1101,47 +1884,78 @@ class TestPheSEIRModel(unittest.TestCase):
         model.read_regional_data(matrices_region, time_changes_region)
 
         # Set regional and time dependent parameters
-        regional_parameters = em.PheRegParameters(
+        regional_parameters = wm.RegParameters(
             model=model,
-            initial_r=[0.5, 1],
-            region_index=2,
-            betas=[[1]*2, [1]*2],
-            times=[1, 2]
+            region_index=2
         )
 
         # Set ICs parameters
-        ICs = em.PheICs(
+        ICs_parameters = wm.ICs(
             model=model,
-            susceptibles_IC=[[5, 6], [7, 8]],
-            exposed1_IC=[[0, 0], [0, 0]],
-            exposed2_IC=[[0, 0], [0, 0]],
-            infectives1_IC=[[0, 0], [0, 0]],
-            infectives2_IC=[[0, 0], [0, 0]],
+            susceptibles_IC=[[5, 6] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
             recovered_IC=[[0, 0], [0, 0]]
         )
 
         # Set disease-specific parameters
-        disease_parameters = em.PheDiseaseParameters(
+        disease_parameters = wm.DiseaseParameters(
             model=model,
-            dL=4,
-            dI=4
+            d=0.4 * np.ones(len(age_groups)),
+            tau=0.4,
+            we=[0.02, 0],
+            omega=1
+        )
+
+        # Set transmission parameters
+        transmission_parameters = wm.Transmission(
+            model=model,
+            beta=0.5 * np.ones(len(age_groups)),
+            alpha=0.5,
+            gamma=1 * np.ones(len(age_groups))
         )
 
         # Set other simulation parameters
-        simulation_parameters = em.PheSimParameters(
+        simulation_parameters = wm.SimParameters(
             model=model,
-            delta_t=0.5,
-            method='my-solver'
+            method='RK45',
+            times=[1, 2],
+            eps=False
+        )
+
+        # Set vaccination parameters
+        vaccine_parameters = wm.VaccineParameters(
+            model=model,
+            vac=0,
+            vacb=0,
+            nu_tra=[1] * 6,
+            nu_symp=[1] * 6,
+            nu_inf=[1] * 6,
+            nu_sev_h=[1] * 6,
+            nu_sev_d=[1] * 6
+        )
+
+        # Set social distancing parameters
+        soc_dist_parameters = wm.SocDistParameters(
+            model=model,
+            phi=1
         )
 
         # Set all parameters in the controller
-        parameters = em.PheParametersController(
+        parameters = wm.ParametersController(
             model=model,
             regional_parameters=regional_parameters,
-            ICs=ICs,
+            ICs_parameters=ICs_parameters,
             disease_parameters=disease_parameters,
-            simulation_parameters=simulation_parameters
-        )
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
 
         output = model.simulate(parameters)
 

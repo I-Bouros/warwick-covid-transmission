@@ -1010,8 +1010,8 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             raise ValueError(
                     'Wrong number of columns for the model new infections.')
         for r in np.asarray(new_infections):
-            for _ in r:
-                for _ in r:
+            for _r in r:
+                for _ in _r:
                     if not isinstance(_, (np.integer, np.floating)):
                         raise TypeError(
                             'Model`s new infections elements must be integer \
@@ -1075,28 +1075,28 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             if ind >= 30:
                 n_daily_hosp[ind, :] = nu_sev_h[0] * np.array(pItoH) * \
                     np.sum(np.matmul(
-                        np.diag(dItoH[:31][::-1]),
-                        new_infections[0][(ind-30):(ind+1), :]), axis=0)
+                        np.diag(dItoH[:30][::-1]),
+                        new_infections[0][(ind-29):(ind+1), :]), axis=0)
                 n_daily_hosp_F[ind, :] = nu_sev_h[1] * np.array(pItoH) * \
                     np.sum(np.matmul(
-                        np.diag(dItoH[:31][::-1]),
-                        new_infections[1][(ind-30):(ind+1), :]), axis=0)
+                        np.diag(dItoH[:30][::-1]),
+                        new_infections[1][(ind-29):(ind+1), :]), axis=0)
                 n_daily_hosp_B[ind, :] = nu_sev_h[2] * np.array(pItoH) * \
                     np.sum(np.matmul(
-                        np.diag(dItoH[:31][::-1]),
-                        new_infections[2][(ind-30):(ind+1), :]), axis=0)
+                        np.diag(dItoH[:30][::-1]),
+                        new_infections[2][(ind-29):(ind+1), :]), axis=0)
                 n_daily_hosp_W1[ind, :] = nu_sev_h[3] * np.array(pItoH) * \
                     np.sum(np.matmul(
-                        np.diag(dItoH[:31][::-1]),
-                        new_infections[3][(ind-30):(ind+1), :]), axis=0)
+                        np.diag(dItoH[:30][::-1]),
+                        new_infections[3][(ind-29):(ind+1), :]), axis=0)
                 n_daily_hosp_W2[ind, :] = nu_sev_h[4] * np.array(pItoH) * \
                     np.sum(np.matmul(
-                        np.diag(dItoH[:31][::-1]),
-                        new_infections[4][(ind-30):(ind+1), :]), axis=0)
+                        np.diag(dItoH[:30][::-1]),
+                        new_infections[4][(ind-29):(ind+1), :]), axis=0)
                 n_daily_hosp_W3[ind, :] = nu_sev_h[5] * np.array(pItoH) * \
                     np.sum(np.matmul(
-                        np.diag(dItoH[:31][::-1]),
-                        new_infections[5][(ind-30):(ind+1), :]), axis=0)
+                        np.diag(dItoH[:30][::-1]),
+                        new_infections[5][(ind-29):(ind+1), :]), axis=0)
             else:
                 n_daily_hosp[ind, :] = nu_sev_h[0] * np.array(pItoH) * \
                     np.sum(np.matmul(
@@ -1186,9 +1186,6 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         if np.asarray(dItoH).shape[0] < 30:
             raise ValueError('Wrong number of delays between onset of \
                 symptoms and hospitalisation.')
-        if np.sum(dItoH) != 1:
-            raise ValueError('Distribution of delays between onset of\
-                symptoms and hospitalisation must be normalised.')
         for _ in dItoH:
             if not isinstance(_, (int, float)):
                 raise TypeError('Delays between onset of symptoms and \
@@ -1254,28 +1251,28 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             if ind >= 30:
                 n_daily_dths[ind, :] = nu_sev_d[0] * np.array(pHtoD) * \
                     np.sum(np.matmul(
-                        np.diag(dHtoD[:31][::-1]),
-                        new_hospitalisation[0][(ind-30):(ind+1), :]), axis=0)
+                        np.diag(dHtoD[:30][::-1]),
+                        new_hospitalisation[0][(ind-29):(ind+1), :]), axis=0)
                 n_daily_dths_F[ind, :] = nu_sev_d[1] * np.array(pHtoD) * \
                     np.sum(np.matmul(
-                        np.diag(dHtoD[:31][::-1]),
-                        new_hospitalisation[1][(ind-30):(ind+1), :]), axis=0)
+                        np.diag(dHtoD[:30][::-1]),
+                        new_hospitalisation[1][(ind-29):(ind+1), :]), axis=0)
                 n_daily_dths_B[ind, :] = nu_sev_d[2] * np.array(pHtoD) * \
                     np.sum(np.matmul(
-                        np.diag(dHtoD[:31][::-1]),
-                        new_hospitalisation[2][(ind-30):(ind+1), :]), axis=0)
+                        np.diag(dHtoD[:30][::-1]),
+                        new_hospitalisation[2][(ind-29):(ind+1), :]), axis=0)
                 n_daily_dths_W1[ind, :] = nu_sev_d[3] * np.array(pHtoD) * \
                     np.sum(np.matmul(
-                        np.diag(dHtoD[:31][::-1]),
-                        new_hospitalisation[3][(ind-30):(ind+1), :]), axis=0)
+                        np.diag(dHtoD[:30][::-1]),
+                        new_hospitalisation[3][(ind-29):(ind+1), :]), axis=0)
                 n_daily_dths_W2[ind, :] = nu_sev_d[4] * np.array(pHtoD) * \
                     np.sum(np.matmul(
-                        np.diag(dHtoD[:31][::-1]),
-                        new_hospitalisation[4][(ind-30):(ind+1), :]), axis=0)
+                        np.diag(dHtoD[:30][::-1]),
+                        new_hospitalisation[4][(ind-29):(ind+1), :]), axis=0)
                 n_daily_dths_W3[ind, :] = nu_sev_d[5] * np.array(pHtoD) * \
                     np.sum(np.matmul(
-                        np.diag(dHtoD[:31][::-1]),
-                        new_hospitalisation[5][(ind-30):(ind+1), :]), axis=0)
+                        np.diag(dHtoD[:30][::-1]),
+                        new_hospitalisation[5][(ind-29):(ind+1), :]), axis=0)
             else:
                 n_daily_dths[ind, :] = nu_sev_d[0] * np.array(pHtoD) * \
                     np.sum(np.matmul(
@@ -1452,7 +1449,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         else:
             return np.zeros(self._num_ages)
 
-    def check_death_format(self, new_deaths, niu):
+    def check_death_format(self, niu):
         """
         Checks correct format of the inputs of number of death calculation.
 
@@ -1467,7 +1464,6 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             Dispersion factor for the negative binomial distribution.
 
         """
-        self.check_new_deaths_format(new_deaths)
         if not isinstance(niu, (int, float)):
             raise TypeError('Dispersion factor must be integer or float.')
         if niu <= 0:
