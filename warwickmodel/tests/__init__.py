@@ -9,4 +9,4 @@
 # To run all tests, use ``python -m unittest discover``.
 #
 # To run a particular test, use e.g.
-#  ``python -m unittest warwickmodel.tests.test_setup_matrices``.
+#  ``python -m unittest warwickmodel.tests.test_model``.

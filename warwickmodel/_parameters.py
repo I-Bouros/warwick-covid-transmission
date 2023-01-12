@@ -337,9 +337,20 @@ class ICs(object):
             the class relates to.
 
         """
-        return [self.susceptibles, self.exposed1, self.exposed2,
-                self.exposed3, self.exposed4, self.exposed5,
-                self.infectives_sym, self.infectives_asym, self.recovered]
+        ics = []
+        a = self.model._num_ages
+
+        ics_vac_stat = [self.susceptibles, self.exposed1, self.exposed2,
+                        self.exposed3, self.exposed4, self.exposed5,
+                        self.infectives_sym, self.infectives_asym]
+
+        for _ in ics_vac_stat:
+            ics += [
+                np.asarray(_)[:, :a], np.asarray(_)[:, a:(2*a)],
+                np.asarray(_)[:, (2*a):(3*a)], np.asarray(_)[:, (3*a):(4*a)],
+                np.asarray(_)[:, (4*a):(5*a)], np.asarray(_)[:, (5*a):(6*a)]]
+
+        return ics + [self.recovered]
 
 #
 # RegParameters Class

@@ -143,6 +143,9 @@ def doctest_rst_and_public_interface():
     # in this list.
     warwickmodel_submodules = [
         'warwickmodel.version_info',
+        'warwickmodel._parameters',
+        'warwickmodel.model',
+        'warwickmodel.inference'
         ]
 
     doc_symbols = get_all_documented_symbols()

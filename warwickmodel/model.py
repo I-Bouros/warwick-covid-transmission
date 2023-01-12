@@ -8,8 +8,8 @@
 #
 """
 This script contains code for modelling the extended SEIR model created by
-Public Health England and Univerity of Cambridge. This is one of the
-official models used by the UK government for policy making.
+Universities of Warwick and Lancaster. This model is used to produce a number
+of research reports for SAGE Working Group on COVID-19.
 
 It uses an extended version of an SEIR model and contact and region specific
 matrices.
@@ -1037,7 +1037,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             infections for different vaccination statuses (unvaccinated, fully-
             vaccinated, boosted, partially-waned, fully-waned, previous-variant
             immunity).
-        pItoH : int or float
+        pItoH : list
             Age-dependent fractions of the number of symptomatic cases that
             end up hospitalised.
         dItoH : list
@@ -1067,6 +1067,9 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         n_daily_hosp_W1 = np.zeros((self._times.shape[0], self._num_ages))
         n_daily_hosp_W2 = np.zeros((self._times.shape[0], self._num_ages))
         n_daily_hosp_W3 = np.zeros((self._times.shape[0], self._num_ages))
+
+        # Normalise dItoH
+        dItoH = ((1/np.sum(dItoH)) * np.asarray(dItoH)).tolist()
 
         for ind, _ in enumerate(self._times.tolist()):
             if ind >= 30:
@@ -1153,7 +1156,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             infections for different vaccination statuses (unvaccinated, fully-
             vaccinated, boosted, partially-waned, fully-waned, previous-variant
             immunity).
-        pItoH : int or float
+        pItoH : list
             Age-dependent fractions of the number of symptomatic cases that
             end up hospitalised.
         dItoH : list
@@ -1180,13 +1183,13 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         if np.asarray(dItoH).ndim != 1:
             raise ValueError('Delays between onset of symptoms and \
                 hospitalisation storage format is 1-dimensional.')
-        if np.asarray(dItoH).shape[0] != len(self._times):
+        if np.asarray(dItoH).shape[0] < 30:
             raise ValueError('Wrong number of delays between onset of \
                 symptoms and hospitalisation.')
         if np.sum(dItoH) != 1:
             raise ValueError('Distribution of delays between onset of\
                 symptoms and hospitalisation must be normalised.')
-        for _ in pItoH:
+        for _ in dItoH:
             if not isinstance(_, (int, float)):
                 raise TypeError('Delays between onset of symptoms and \
                     hospitalisation must be integer or float.')
@@ -1213,7 +1216,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             cases for different vaccination statuses (unvaccinated, fully-
             vaccinated, boosted, partially-waned, fully-waned, previous-variant
             immunity).
-        pHtoD : int or float
+        pHtoD : list
             Age-dependent fractions of the number of hospitalised cases that
             die.
         dHtoD : list
@@ -1243,6 +1246,9 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         n_daily_dths_W1 = np.zeros((self._times.shape[0], self._num_ages))
         n_daily_dths_W2 = np.zeros((self._times.shape[0], self._num_ages))
         n_daily_dths_W3 = np.zeros((self._times.shape[0], self._num_ages))
+
+        # Normalise dHtoD
+        dHtoD = ((1/np.sum(dHtoD)) * np.asarray(dHtoD)).tolist()
 
         for ind, _ in enumerate(self._times.tolist()):
             if ind >= 30:
@@ -1317,7 +1323,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             n_daily_dths, n_daily_dths_F, n_daily_dths_B,
             n_daily_dths_W1, n_daily_dths_W2, n_daily_dths_W3]
 
-    def check_new_total_deaths_format(
+    def check_new_deaths_format(
             self, new_hospitalisation, pHtoD, dHtoD):
         """
         Checks correct format of the inputs of number of death
@@ -1357,7 +1363,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         if np.asarray(dHtoD).ndim != 1:
             raise ValueError('Delays between hospital admission and \
                 death storage format is 1-dimensional.')
-        if np.asarray(dHtoD).shape[0] != len(self._times):
+        if np.asarray(dHtoD).shape[0] < 30:
             raise ValueError('Wrong number of delays between hospital \
                 admission and death.')
         if np.sum(dHtoD) != 1:
@@ -1391,9 +1397,11 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         ----------
         obs_death : list
             List of number of observed deaths by age group at time point k.
-        new_deaths : numpy.array
-            Age-structured matrix of the number of new deaths from the
-            simulation method for the WarwickLancSEIRModel.
+        new_deaths : list of numpy.array
+            Age-structured matrix of the number of new deaths for different
+            vaccination statuses (unvaccinated, fully-vaccinated,
+            boosted, partially-waned, fully-waned, previous-variant immunity)
+            from the simulation method for the WarwickLancSEIRModel.
         niu : float
             Dispersion factor for the negative binomial distribution.
         k : int
@@ -1451,15 +1459,15 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         Parameters
         ----------
         new_deaths : list of numpy.array
-            Age-structured matrices of the number of new deaths from the
-            simulation method for the WarwickLancSEIRModel for different
+            Age-structured matrices of the number of new deaths for different
             vaccination statuses (unvaccinated, fully-vaccinated,
-            boosted, partially-waned, fully-waned, previous-variant immunity).
+            boosted, partially-waned, fully-waned, previous-variant immunity)
+            from the simulation method for the WarwickLancSEIRModel.
         niu : float
             Dispersion factor for the negative binomial distribution.
 
         """
-        self._check_new_deaths_format(new_deaths)
+        self.check_new_deaths_format(new_deaths)
         if not isinstance(niu, (int, float)):
             raise TypeError('Dispersion factor must be integer or float.')
         if niu <= 0:
@@ -1475,11 +1483,11 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         k : int
             Index of day for which we intend to sample the number of deaths for
             by age group.
-        new_deaths : numpy.array
-            Age-structured matrices of the number of new deaths from the
-            simulation method for the WarwickLancSEIRModel for different
+        new_deaths : list of numpy.array
+            Age-structured matrices of the number of new deaths  for different
             vaccination statuses (unvaccinated, fully-vaccinated,
-            boosted, partially-waned, fully-waned, previous-variant immunity).
+            boosted, partially-waned, fully-waned, previous-variant immunity)
+            from the simulation method for the WarwickLancSEIRModel.
 
         Returns
         -------
@@ -1488,7 +1496,8 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             observed in specified region at time :math:`t_k`.
 
         """
-        return new_deaths[k, :]
+        return new_deaths[0][k, :] + new_deaths[1][k, :] + \
+            new_deaths[2][k, :] + new_deaths[4][k, :] + new_deaths[5][k, :]
 
     def samples_deaths(self, new_deaths, niu, k):
         r"""
@@ -1509,10 +1518,10 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         Parameters
         ----------
         new_deaths : numpy.array
-            Age-structured matrices of the number of new deaths from the
-            simulation method for the WarwickLancSEIRModel for different
+            Age-structured matrices of the number of new deaths for different
             vaccination statuses (unvaccinated, fully-vaccinated,
-            boosted, partially-waned, fully-waned, previous-variant immunity).
+            boosted, partially-waned, fully-waned, previous-variant immunity)
+            from the simulation method for the WarwickLancSEIRModel.
         niu : float
             Dispersion factor for the negative binomial distribution.
         k : int
