@@ -29,7 +29,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
              'E5', 'E1f', 'E2f', 'E3f', 'E4f', 'E5f', 'E1b', 'E2b', 'E3b',
              'E4b', 'E5b', 'E1w1', 'E2w1', 'E3w1', 'E4w1', 'E5w1', 'E1w2',
              'E2w2', 'E3w2', 'E4w2', 'E5w2', 'E1w3', 'E2w3', 'E3w3', 'E4w3',
-             'E5w3', 'I', 'If', 'Ib', 'Iw1', 'Iw2', 'Iw3', 'A', 'Sf', 'Ab',
+             'E5w3', 'I', 'If', 'Ib', 'Iw1', 'Iw2', 'Iw3', 'A', 'Af', 'Ab',
              'Aw1', 'Aw2', 'Aw3', 'R', 'Incidence'])
         self.assertEqual(
             model._parameter_names,
@@ -38,7 +38,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
              'E2b0', 'E3b0', 'E4b0', 'E5b0', 'E1w10', 'E2w10', 'E3w10',
              'E4w10', 'E5w10', 'E1w20', 'E2w20', 'E3w20', 'E4w20', 'E5w20',
              'E1w30', 'E2w30', 'E3w30', 'E4w30', 'E5w30', 'I0', 'If0', 'Ib0',
-             'Iw10', 'Iw20', 'Iw30', 'A0', 'Sf0', 'Ab0', 'Aw10', 'Aw20',
+             'Iw10', 'Iw20', 'Iw30', 'A0', 'Af0', 'Ab0', 'Aw10', 'Aw20',
              'Aw30', 'R0', 'beta', 'alpha', 'gamma', 'd', 'tau', 'we',
              'omega'])
         self.assertEqual(model._n_outputs, 50)
@@ -60,7 +60,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
              'E5', 'E1f', 'E2f', 'E3f', 'E4f', 'E5f', 'E1b', 'E2b', 'E3b',
              'E4b', 'E5b', 'E1w1', 'E2w1', 'E3w1', 'E4w1', 'E5w1', 'E1w2',
              'E2w2', 'E3w2', 'E4w2', 'E5w2', 'E1w3', 'E2w3', 'E3w3', 'E4w3',
-             'E5w3', 'I', 'If', 'Ib', 'Iw1', 'Iw2', 'Iw3', 'A', 'Sf', 'Ab',
+             'E5w3', 'I', 'If', 'Ib', 'Iw1', 'Iw2', 'Iw3', 'A', 'Af', 'Ab',
              'Aw1', 'Aw2', 'Aw3', 'R', 'Incidence'])
 
     def test_parameter_names(self):
@@ -72,7 +72,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
              'E2b0', 'E3b0', 'E4b0', 'E5b0', 'E1w10', 'E2w10', 'E3w10',
              'E4w10', 'E5w10', 'E1w20', 'E2w20', 'E3w20', 'E4w20', 'E5w20',
              'E1w30', 'E2w30', 'E3w30', 'E4w30', 'E5w30', 'I0', 'If0', 'Ib0',
-             'Iw10', 'Iw20', 'Iw30', 'A0', 'Sf0', 'Ab0', 'Aw10', 'Aw20',
+             'Iw10', 'Iw20', 'Iw30', 'A0', 'Af0', 'Ab0', 'Aw10', 'Aw20',
              'Aw30', 'R0', 'beta', 'alpha', 'gamma', 'd', 'tau', 'we',
              'omega'])
 

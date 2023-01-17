@@ -1,5 +1,5 @@
 #
-# LogLik Class
+# WarwickLancLogLik Class
 #
 # This file is part of WARWICKMODEL
 # (https://github.com/I-Bouros/warwick-covid-transmission.git) which is
@@ -21,11 +21,11 @@ import pints
 from iteration_utilities import deepflatten
 from scipy.stats import norm, gamma
 
-import epimodels as em
+import warwickmodel as wm
 
 
-class LogLik(pints.LogPDF):
-    """LogLik Class:
+class WarwickLancLogLik(pints.LogPDF):
+    """WarwickLancLogLik Class:
     Controller class to construct the log-likelihood needed for optimisation or
     inference in a PINTS framework.
 
@@ -269,12 +269,12 @@ class LogLik(pints.LogPDF):
         return self._log_likelihood(x[:-1])
 
 #
-# LogPrior Class
+# WarwickLancLogPrior Class
 #
 
 
-class LogPrior(pints.LogPrior):
-    """LogPrior Class:
+class WarwickLancLogPrior(pints.LogPrior):
+    """WarwickLancLogPrior Class:
     Controller class to construct the log-prior needed for optimisation or
     inference in a PINTS framework.
 
@@ -288,7 +288,7 @@ class LogPrior(pints.LogPrior):
 
     """
     def __init__(self, model, times):
-        super(LogPrior, self).__init__()
+        super(WarwickLancLogPrior, self).__init__()
         # Set the prerequisites for the inference wrapper
         # Model
         self._model = model
@@ -347,12 +347,12 @@ class LogPrior(pints.LogPrior):
         return log_prior
 
 #
-# SEIRInfer Class
+# WarwickLancSEIRInfer Class
 #
 
 
-class SEIRInfer(object):
-    """SEIRInfer Class:
+class WarwickLancSEIRInfer(object):
+    """WarwickLancSEIRInfer Class:
     Controller class for the optimisation or inference of parameters of the
      model in a PINTS framework.
 
@@ -363,10 +363,10 @@ class SEIRInfer(object):
 
     """
     def __init__(self, model):
-        super(SEIRInfer, self).__init__()
+        super(WarwickLancSEIRInfer, self).__init__()
 
         # Assign model for inference or optimisation
-        if not isinstance(model, em.WarwickLancSEIRModel):
+        if not isinstance(model, wm.WarwickLancSEIRModel):
             raise TypeError('Wrong model type for parameters inference.')
 
         self._model = model
@@ -466,7 +466,7 @@ class SEIRInfer(object):
             parameter space.
 
         """
-        loglikelihood = LogLik(
+        loglikelihood = WarwickLancLogLik(
             self._model, self._susceptibles_data, self._infectives_data, times,
             self._deaths, self._time_to_death, self._deaths_times,
             self._fatality_ratio,
@@ -492,7 +492,7 @@ class SEIRInfer(object):
 
         """
         # Create a likelihood
-        loglikelihood = LogLik(
+        loglikelihood = WarwickLancLogLik(
             self._model, self._susceptibles_data, self._infectives_data, times,
             self._deaths, self._time_to_death, self._deaths_times,
             self._fatality_ratio,
@@ -500,7 +500,7 @@ class SEIRInfer(object):
             self._sens, self._spec, wd, wp)
 
         # Create a prior
-        log_prior = LogPrior(self._model, times)
+        log_prior = WarwickLancLogPrior(self._model, times)
 
         # Create a posterior log-likelihood (log(likelihood * prior))
         self._log_posterior = pints.LogPosterior(loglikelihood, log_prior)

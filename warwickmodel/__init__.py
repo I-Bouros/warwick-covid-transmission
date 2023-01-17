@@ -22,7 +22,11 @@ sampling methods, using the PINTS and epimodels python modules.
 from .version_info import VERSION_INT, VERSION  # noqa
 
 # Import inference submodule
-from .inference import LogLik, LogPrior, SEIRInfer  # noqa
+from .inference import (  # noqa
+    WarwickLancLogLik,
+    WarwickLancLogPrior,
+    WarwickLancSEIRInfer
+)
 
 # Import models
 from .model import WarwickLancSEIRModel  # noqa

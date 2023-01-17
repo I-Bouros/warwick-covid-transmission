@@ -203,7 +203,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             'E1f', 'E2f', 'E3f', 'E4f', 'E5f', 'E1b', 'E2b', 'E3b', 'E4b',
             'E5b', 'E1w1', 'E2w1', 'E3w1', 'E4w1', 'E5w1', 'E1w2', 'E2w2',
             'E3w2', 'E4w2', 'E5w2', 'E1w3', 'E2w3', 'E3w3', 'E4w3', 'E5w3',
-            'I', 'If', 'Ib', 'Iw1', 'Iw2', 'Iw3', 'A', 'Sf', 'Ab', 'Aw1',
+            'I', 'If', 'Ib', 'Iw1', 'Iw2', 'Iw3', 'A', 'Af', 'Ab', 'Aw1',
             'Aw2', 'Aw3', 'R', 'Incidence']
         self._parameter_names = [
             'S0', 'Sf0', 'Sb0', 'Sw10', 'Sw20', 'Sw30', 'E10', 'E20', 'E30',
@@ -211,7 +211,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             'E2b0', 'E3b0', 'E4b0', 'E5b0', 'E1w10', 'E2w10', 'E3w10', 'E4w10',
             'E5w10', 'E1w20', 'E2w20', 'E3w20', 'E4w20', 'E5w20', 'E1w30',
             'E2w30', 'E3w30', 'E4w30', 'E5w30', 'I0', 'If0', 'Ib0', 'Iw10',
-            'Iw20', 'Iw30', 'A0', 'Sf0', 'Ab0', 'Aw10', 'Aw20', 'Aw30', 'R0',
+            'Iw20', 'Iw30', 'A0', 'Af0', 'Ab0', 'Aw10', 'Aw20', 'Aw30', 'R0',
             'beta', 'alpha', 'gamma', 'd', 'tau', 'we', 'omega']
 
         # The default number of outputs is 50,
@@ -439,7 +439,8 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             y[(48*a):])
 
         # Read the social distancing parameters of the system
-        phi = self.social_distancing_param
+        phi_all = self.social_distancing_param
+        phi = phi_all[r-1]
 
         # Read the vaccination parameters of the system
         vac_all, vacb_all, nu_tra, nu_symp, nu_inf = self.vaccine_param[:5]
@@ -611,6 +612,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             lambda t, y: self._right_hand_side(
                 t, self._region, y, self._c, num_a_groups),
             [times[0], times[-1]], init_cond, method=method, t_eval=times)
+
         return sol
 
     def _split_simulate(
