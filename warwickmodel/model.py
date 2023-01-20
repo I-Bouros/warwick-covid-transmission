@@ -484,7 +484,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         lam_W2 = nu_inf[4] * np.multiply(beta, np.dot(
             cont_mat, np.asarray(iW2) + tau * np.asarray(aW2)))
         lam_W2_times_s = omega * phi * nu_tra[4] * np.multiply(
-            np.multiply(sW1, (1 / self._N[r-1])), lam_W2)
+            np.multiply(sW2, (1 / self._N[r-1])), lam_W2)
 
         lam_W3 = nu_inf[5] * np.multiply(beta, np.dot(
             cont_mat, np.asarray(iW3) + tau * np.asarray(aW3)))
@@ -496,9 +496,9 @@ class WarwickLancSEIRModel(pints.ForwardModel):
                 sW2) + we1 * np.asarray(sW3),
             -lam_F_times_s + vac * np.asarray(s) - we1 * np.asarray(
                 sF) - vacb * np.asarray(sF),
-            -lam_B_times_s + vacb * np.asarray(sF) + vacb * np.asarray(
-                sB) + vacb * np.array(sW1) + vacb * np.array(
-                sW2) + self._eps * vacb * np.array(_) - we1 * np.asarray(sB),
+            -lam_B_times_s + vacb * np.asarray(sF) + vacb * np.array(
+                sW1) + vacb * np.array(sW2) + self._eps * vacb * np.array(
+                _) - we1 * np.asarray(sB),
             -lam_W1_times_s - we1 * np.asarray(sW1) + we1 * np.array(
                 sB) - vacb * np.asarray(sW1) + we1 * np.array(_),
             -lam_W2_times_s - vacb * np.asarray(sW2) + we1 * np.asarray(
