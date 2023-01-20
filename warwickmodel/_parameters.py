@@ -325,6 +325,33 @@ class ICs(object):
                         'The inital numbers of recovered must be integer or \
                             float.')
 
+    def total_population(self):
+        """
+        Returns the country-specific total number of individuals in each age
+        group.
+
+        Returns
+        -------
+        List of lists
+            List of the ountry-specific total number of individuals in each age
+            group using the initial conditions of the
+            :class:`WarwickLancSEIRModel` the class relates to.
+
+        """
+        a = self.model._num_ages
+        total_pop = 0
+
+        ics_vac_stat = [self.susceptibles, self.exposed1, self.exposed2,
+                        self.exposed3, self.exposed4, self.exposed5,
+                        self.infectives_sym, self.infectives_asym]
+
+        for _ in ics_vac_stat:
+            total_pop += np.asarray(_)[:, :a] + np.asarray(_)[:, a:(2*a)] + \
+                np.asarray(_)[:, (2*a):(3*a)] + np.asarray(_)[:, (3*a):(4*a)] \
+                + np.asarray(_)[:, (4*a):(5*a)] + np.asarray(_)[:, (5*a):(6*a)]
+
+        return total_pop + np.array(self.recovered)
+
     def __call__(self):
         """
         Returns the initial conditions of the :class:`WarwickLancSEIRModel` the
@@ -340,15 +367,80 @@ class ICs(object):
         ics = []
         a = self.model._num_ages
 
-        ics_vac_stat = [self.susceptibles, self.exposed1, self.exposed2,
-                        self.exposed3, self.exposed4, self.exposed5,
-                        self.infectives_sym, self.infectives_asym]
+        # Susceptibles
+        ics += [
+            np.asarray(self.susceptibles)[:, :a],
+            np.asarray(self.susceptibles)[:, a:(2*a)],
+            np.asarray(self.susceptibles)[:, (2*a):(3*a)],
+            np.asarray(self.susceptibles)[:, (3*a):(4*a)],
+            np.asarray(self.susceptibles)[:, (4*a):(5*a)],
+            np.asarray(self.susceptibles)[:, (5*a):(6*a)]]
 
-        for _ in ics_vac_stat:
-            ics += [
-                np.asarray(_)[:, :a], np.asarray(_)[:, a:(2*a)],
-                np.asarray(_)[:, (2*a):(3*a)], np.asarray(_)[:, (3*a):(4*a)],
-                np.asarray(_)[:, (4*a):(5*a)], np.asarray(_)[:, (5*a):(6*a)]]
+        # Exposed unvaccinated
+        ics += [
+            np.asarray(self.exposed1)[:, :a],
+            np.asarray(self.exposed2)[:, :a],
+            np.asarray(self.exposed3)[:, :a],
+            np.asarray(self.exposed4)[:, :a],
+            np.asarray(self.exposed5)[:, :a]]
+
+        # Exposed fully vaccinated
+        ics += [
+            np.asarray(self.exposed1)[:, a:(2*a)],
+            np.asarray(self.exposed2)[:, a:(2*a)],
+            np.asarray(self.exposed3)[:, a:(2*a)],
+            np.asarray(self.exposed4)[:, a:(2*a)],
+            np.asarray(self.exposed5)[:, a:(2*a)]]
+
+        # Exposed boosted
+        ics += [
+            np.asarray(self.exposed1)[:, (2*a):(3*a)],
+            np.asarray(self.exposed2)[:, (2*a):(3*a)],
+            np.asarray(self.exposed3)[:, (2*a):(3*a)],
+            np.asarray(self.exposed4)[:, (2*a):(3*a)],
+            np.asarray(self.exposed5)[:, (2*a):(3*a)]]
+
+        # Exposed partially waned
+        ics += [
+            np.asarray(self.exposed1)[:, (3*a):(4*a)],
+            np.asarray(self.exposed2)[:, (3*a):(4*a)],
+            np.asarray(self.exposed3)[:, (3*a):(4*a)],
+            np.asarray(self.exposed4)[:, (3*a):(4*a)],
+            np.asarray(self.exposed5)[:, (3*a):(4*a)]]
+
+        # Exposed fully waned
+        ics += [
+            np.asarray(self.exposed1)[:, (4*a):(5*a)],
+            np.asarray(self.exposed2)[:, (4*a):(5*a)],
+            np.asarray(self.exposed3)[:, (4*a):(5*a)],
+            np.asarray(self.exposed4)[:, (4*a):(5*a)],
+            np.asarray(self.exposed5)[:, (4*a):(5*a)]]
+
+        # Exposed previous variant
+        ics += [
+            np.asarray(self.exposed1)[:, (5*a):(6*a)],
+            np.asarray(self.exposed2)[:, (5*a):(6*a)],
+            np.asarray(self.exposed3)[:, (5*a):(6*a)],
+            np.asarray(self.exposed4)[:, (5*a):(6*a)],
+            np.asarray(self.exposed5)[:, (5*a):(6*a)]]
+
+        # Symptomatic infected
+        ics += [
+            np.asarray(self.infectives_sym)[:, :a],
+            np.asarray(self.infectives_sym)[:, a:(2*a)],
+            np.asarray(self.infectives_sym)[:, (2*a):(3*a)],
+            np.asarray(self.infectives_sym)[:, (3*a):(4*a)],
+            np.asarray(self.infectives_sym)[:, (4*a):(5*a)],
+            np.asarray(self.infectives_sym)[:, (5*a):(6*a)]]
+
+        # Asymptomatic infected
+        ics += [
+            np.asarray(self.infectives_asym)[:, :a],
+            np.asarray(self.infectives_asym)[:, a:(2*a)],
+            np.asarray(self.infectives_asym)[:, (2*a):(3*a)],
+            np.asarray(self.infectives_asym)[:, (3*a):(4*a)],
+            np.asarray(self.infectives_asym)[:, (4*a):(5*a)],
+            np.asarray(self.infectives_asym)[:, (5*a):(6*a)]]
 
         return ics + [self.recovered]
 

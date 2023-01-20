@@ -59,28 +59,31 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         \begin{eqnarray}
             \frac{dS^i}{dt} &=& - \phi \omega \nu_\text{tra}\beta^i
                 \sum_{j} \nu_\text{inf}C^{ij}S^i\Big(I^j + \tau^j
-                A^j\Big) - VacR S^i + WE S_{W2}^i + WE3 S_{W3}^i \\
+                A^j\Big) - \text{Vac} S^i + \text{WE} S_{W2}^i +
+                \text{WE} S_{W3}^i \\
             \frac{dS_F^i}{dt} &=& - \phi \omega \nu_\text{tra,F}\beta^i
                 \sum_{j} \nu_\text{inf,F}C^{ij}S_F^i\Big(I_F^j +
-                \tau^j A_F^j \Big) + VacR S^i - VacR_B S_F^i
-                - WE S_F^i \\
+                \tau^j A_F^j \Big) + \text{Vac} S^i - \text{VacB} S_F^i
+                - \text{WE} S_F^i \\
             \frac{dS_B^i}{dt} &=& - \phi \omega \nu_\text{tra,B}
                 \beta^i \sum_{j} \nu_\text{inf,B}C^{ij}S_B^i\Big(I_B^j
-                + \tau^j A_B^j \Big) + VacR_B S_F^i + VacR_B
-                S_{W1}^i + VacR_B S_{W2}^i - WE S_B^i \\
+                + \tau^j A_B^j \Big) + \text{VacB} S_F^i + \text{VacB}
+                S_{W1}^i + \text{VacB} S_{W2}^i - \text{WE} S_B^i
+                + \epsilon \text{VacB} R^i\\
             \frac{dS_{W1}^i}{dt} &=& - \phi \omega \nu_\text{tra,W1}
                 \beta^i \sum_{j} \nu_\text{inf,W1}C^{ij}S_{W1}^i
-                \Big(I_{W1}^j + \tau^j A_{W1}^j\Big) - VacR_B
-                S_{W1}^i - WE S_{W1}^i + WE S_B^i + WE R^i \\
+                \Big(I_{W1}^j + \tau^j A_{W1}^j\Big) - \text{VacB}
+                S_{W1}^i - \text{WE} S_{W1}^i + \text{WE} S_B^i +
+                \text{WE} R^i \\
             \frac{dS_{W2}^i}{dt} &=& - \phi \omega \nu_\text{tra,W2}
                 \beta^i \sum_{j} \nu_\text{inf,W2}C^{ij}S_{W2}^i
-                \Big(I_{W2}^j + \tau^j A_{W2}^j\Big) - VacR_B
-                S_{W2}^i - WE S_{W2}^i + WE S_F^i +
-                WE S_{W1}^i - WE3 S_{W2}^i \\
+                \Big(I_{W2}^j + \tau^j A_{W2}^j\Big) - \text{VacB}
+                S_{W2}^i - \text{WE} S_{W2}^i + \text{WE} S_F^i +
+                \text{WE} S_{W1}^i - \text{WE3} S_{W2}^i \\
             \frac{dS_{W3}^i}{dt} &=& - \phi \omega \nu_\text{tra,W3}
                 \beta^i \sum_{j} \nu_\text{inf,W3}C^{ij}S_{W3}^i
-                \Big(I_{W3}^j + \tau^j A_{W3}^j\Big) - WE S_{W3}^i +
-                WE3 S_{W2}^i \\
+                \Big(I_{W3}^j + \tau^j A_{W3}^j\Big) - \text{WE} S_{W3}^i +
+                \text{WE3} S_{W2}^i \\
             \frac{dE_1^i}{dt} &=& \phi \omega \nu_\text{tra}\beta^i
                 \sum_{j} \nu_\text{inf}C^{ij}S^i\Big(I^j +
                 \tau^j A^j\Big) - \alpha E_1^i \\
@@ -176,7 +179,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
                 \gamma^i \Big(I_{W1}^i + A_{W1}^i\Big) +
                 \gamma^i \Big(I_{W2}^i + A_{W2}^i\Big) +
                 \gamma^i \Big(I_{W3}^i + A_{W3}^i\Big) -
-                WE R^i
+                \text{WE} R^i - \epsilon \text{VacB} R^i
         \end{eqnarray}
 
     where :math:`i` is the age group of the individual, :math:`C^{ij}` is the
@@ -397,7 +400,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             y[:a], y[a:(2*a)], y[(2*a):(3*a)],
             y[(3*a):(4*a)], y[(4*a):(5*a)], y[(5*a):(6*a)])
 
-        # E1, ..., E5I
+        # E1, ..., E5
         e1, e2, e3, e4, e5 = (
             y[(6*a):(7*a)], y[(7*a):(8*a)], y[(8*a):(9*a)],
             y[(9*a):(10*a)], y[(10*a):(11*a)])
@@ -460,27 +463,33 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         # Write actual RHS
         lam = nu_inf[0] * np.multiply(beta, np.dot(
             cont_mat, np.asarray(i) + tau * np.asarray(a)))
-        lam_times_s = omega * phi * nu_tra[0] * np.multiply(s, lam)
+        lam_times_s = omega * phi * nu_tra[0] * np.multiply(
+            np.multiply(s, (1 / self._N[r-1])), lam)
 
         lam_F = nu_inf[1] * np.multiply(beta, np.dot(
             cont_mat, np.asarray(iF) + tau * np.asarray(aF)))
-        lam_F_times_s = omega * phi * nu_tra[1] * np.multiply(sF, lam_F)
+        lam_F_times_s = omega * phi * nu_tra[1] * np.multiply(
+            np.multiply(sF, (1 / self._N[r-1])), lam_F)
 
         lam_B = nu_inf[2] * np.multiply(beta, np.dot(
             cont_mat, np.asarray(iB) + tau * np.asarray(aB)))
-        lam_B_times_s = omega * phi * nu_tra[2] * np.multiply(sB, lam_B)
+        lam_B_times_s = omega * phi * nu_tra[2] * np.multiply(
+            np.multiply(sB, (1 / self._N[r-1])), lam_B)
 
         lam_W1 = nu_inf[3] * np.multiply(beta, np.dot(
             cont_mat, np.asarray(iW1) + tau * np.asarray(aW1)))
-        lam_W1_times_s = omega * phi * nu_tra[3] * np.multiply(sW1, lam_W1)
+        lam_W1_times_s = omega * phi * nu_tra[3] * np.multiply(
+            np.multiply(sW1, (1 / self._N[r-1])), lam_W1)
 
         lam_W2 = nu_inf[4] * np.multiply(beta, np.dot(
             cont_mat, np.asarray(iW2) + tau * np.asarray(aW2)))
-        lam_W2_times_s = omega * phi * nu_tra[4] * np.multiply(sW2, lam_W2)
+        lam_W2_times_s = omega * phi * nu_tra[4] * np.multiply(
+            np.multiply(sW1, (1 / self._N[r-1])), lam_W2)
 
         lam_W3 = nu_inf[5] * np.multiply(beta, np.dot(
             cont_mat, np.asarray(iW3) + tau * np.asarray(aW3)))
-        lam_W3_times_s = omega * phi * nu_tra[5] * np.multiply(sW3, lam_W3)
+        lam_W3_times_s = omega * phi * nu_tra[5] * np.multiply(
+            np.multiply(sW3, (1 / self._N[r-1])), lam_W3)
 
         dydt = np.concatenate((
             -lam_times_s - vac * np.asarray(s) + we1 * np.asarray(
@@ -653,7 +662,6 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         # Split parameters into the features of the model
         self._region = parameters[0]
         self._y_init = parameters[1:50]
-        self._N = np.sum(np.asarray(self._y_init))
         self._c = parameters[50:57]
         self.contacts_timeline = em.MultiTimesContacts(
             self.matrices_contact,
@@ -768,6 +776,8 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         """
         self.social_distancing_param = parameters.soc_dist_parameters()
         self.vaccine_param = parameters.vaccine_parameters()
+
+        self._N = parameters.ICs.total_population()
 
         return self._simulate(
             parameters(), parameters.simulation_parameters.times)

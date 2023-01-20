@@ -651,6 +651,38 @@ class TestICs(unittest.TestCase):
                 infectives_asym_IC=infectives_asym,
                 recovered_IC=recovered1)
 
+    def test_total_population(self):
+        model = examplemodel
+
+        # ICs parameters
+        susceptibles = [[500, 600] + [0, 0] * 5, [700, 800] + [0, 0] * 5]
+        exposed1 = [[0, 0] * 6, [0, 0] * 6]
+        exposed2 = [[0, 0] * 6, [0, 0] * 6]
+        exposed3 = [[0, 0] * 6, [0, 0] * 6]
+        exposed4 = [[0, 0] * 6, [0, 0] * 6]
+        exposed5 = [[0, 0] * 6, [0, 0] * 6]
+        infectives_sym = [[10, 20] * 5 + [0, 0], [0, 5] * 5 + [0, 0]]
+        infectives_asym = [[15, 10] * 5 + [0, 0], [30, 10] * 5 + [0, 0]]
+        recovered = [[0, 0], [0, 0]]
+
+        ICs_parameters = wm.ICs(
+            model=model,
+            susceptibles_IC=susceptibles,
+            exposed1_IC=exposed1,
+            exposed2_IC=exposed2,
+            exposed3_IC=exposed3,
+            exposed4_IC=exposed4,
+            exposed5_IC=exposed5,
+            infectives_sym_IC=infectives_sym,
+            infectives_asym_IC=infectives_asym,
+            recovered_IC=recovered
+        )
+
+        npt.assert_array_equal(
+            ICs_parameters.total_population(),
+            np.asarray([[625, 750], [850, 875]])
+        )
+
     def test__call__(self):
         model = examplemodel
 
