@@ -167,6 +167,26 @@ class WarwickLancSEIRModel(pints.ForwardModel):
                 \text{WE} R^i - \epsilon \text{VacB} R^i
         \end{eqnarray}
 
+    with:
+
+    .. math::
+       :nowrap:
+
+        \begin{eqnarray}
+            \lambda^i = \sum_{j} \nu_\text{inf}C^{ij} \frac{1}{N^j}
+                \Big(I^j + \tau^j A^j\Big) +
+                    \sum_{j} \nu_\text{inf,F} C^{ij} \frac{1}{N^j}
+                \Big(I_F^j + \tau^j A_F^j\Big) +
+                    \sum_{j} \nu_\text{inf,B} C^{ij} \frac{1}{N^j}
+                \Big(I_B^j + \tau^j A_B^j\Big) +
+                    \sum_{j} \nu_\text{inf,W1} C^{ij} \frac{1}{N^j}
+                \Big(I_{W1}^j + \tau^j A_{W1}^j\Big) +
+                    \sum_{j} \nu_\text{inf,W2} C^{ij} \frac{1}{N^j}
+                \Big(I_{W2}^j + \tau^j A_{W2}^j\Big) +
+                    \sum_{j} \nu_\text{inf,W3} C^{ij} \frac{1}{N^j}
+                \Big(I_{W3}^j + \tau^j A_{W3}^j\Big)
+        \end{eqnarray}
+
     where :math:`i` is the age group of the individual, :math:`C^{ij}` is the
     :math:`(i,j)` th element of the regional contact matrix, and represents
     the expected number of new infections in age group :math:`i` caused by an
