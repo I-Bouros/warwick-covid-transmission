@@ -958,6 +958,9 @@ class VaccineParameters(object):
         Country-specific vaccination rate of the susceptible population.
     vacb : int or float or list
         Country-specific booster vaccination rate.
+    adult : list
+        List of the proportions of each age-group that are boosted or
+        vaccinated.
     nu_tra : int or float or list
         Vaccine effects on transmission for different vaccination statuses
         (unvaccinated, fully-vaccinated, boosted, partially-waned,
@@ -981,7 +984,7 @@ class VaccineParameters(object):
 
     """
     def __init__(
-            self, model, vac, vacb, nu_tra, nu_symp, nu_inf, nu_sev_h,
+            self, model, vac, vacb, adult, nu_tra, nu_symp, nu_inf, nu_sev_h,
             nu_sev_d):
         super(VaccineParameters, self).__init__()
 
@@ -994,9 +997,11 @@ class VaccineParameters(object):
 
         # Check inputs format
         self._check_parameters_input(
-            vac, vacb, nu_tra, nu_symp, nu_inf, nu_sev_h, nu_sev_d)
+            vac, vacb, adult, nu_tra, nu_symp, nu_inf, nu_sev_h, nu_sev_d)
 
         # Set vaccination parameters
+        self.adult = adult
+
         if isinstance(vac, (float, int)):
             self.vac = vac * np.ones(len(self.model.regions))
         else:
@@ -1033,7 +1038,8 @@ class VaccineParameters(object):
             self.nu_sev_d = nu_sev_d
 
     def _check_parameters_input(
-            self, vac, vacb, nu_tra, nu_symp, nu_inf, nu_sev_h, nu_sev_d):
+            self, vac, vacb, adult, nu_tra, nu_symp, nu_inf, nu_sev_h,
+            nu_sev_d):
         """
         Check correct format of the vaccination-specific parameters input.
 
@@ -1043,6 +1049,9 @@ class VaccineParameters(object):
             Country-specific vaccination rate of the susceptible population.
         vacb : int or float or list
             Country-specific booster vaccination rate.
+        adult : list
+            List of the proportions of each age-group that are boosted or
+            vaccinated.
         nu_tra : int or float or list
             Vaccine effects on transmission for different vaccination statuses
             (unvaccinated, fully-vaccinated, boosted, partially-waned,
@@ -1100,6 +1109,26 @@ class VaccineParameters(object):
             if _ < 0:
                 raise ValueError('The country-specific booster vaccination \
                     rate must be => 0.')
+
+        if np.asarray(adult).ndim != 1:
+            raise ValueError('The list of the proportions of each age-group \
+                that are boosted or vaccinated storage format must be \
+                1-dimensional.')
+        if np.asarray(adult).shape[0] != len(self.model.age_groups):
+            raise ValueError(
+                    'Wrong number of age-groups for the list of the \
+                    proportions of each age-group that are boosted or \
+                    vaccinated.')
+        for _ in adult:
+            if not isinstance(_, (float, int)):
+                raise TypeError('The proportions of each age-group that are \
+                    boosted or vaccinated must be float or integer.')
+            if _ < 0:
+                raise ValueError('The proportions of each age-group that are \
+                    boosted or vaccinated must be => 0.')
+            if _ > 1:
+                raise ValueError('The proportions of each age-group that are \
+                    boosted or vaccinated must be <= 1.')
 
         if isinstance(nu_tra, (float, int)):
             nu_tra = [nu_tra]
@@ -1209,7 +1238,7 @@ class VaccineParameters(object):
 
         """
         return [
-            self.vac, self.vacb, self.nu_tra, self.nu_symp,
+            self.vac, self.vacb, self.adult, self.nu_tra, self.nu_symp,
             self.nu_inf, self.nu_sev_h, self.nu_sev_d]
 
 #

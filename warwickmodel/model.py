@@ -57,43 +57,35 @@ class WarwickLancSEIRModel(pints.ForwardModel):
        :nowrap:
 
         \begin{eqnarray}
-            \frac{dS^i}{dt} &=& - \phi \omega \nu_\text{tra}\beta^i
-                \sum_{j} \nu_\text{inf}C^{ij}S^i\Big(I^j + \tau^j
-                A^j\Big) - \text{Vac} S^i + \text{WE} S_{W2}^i +
+            \frac{dS^i}{dt} &=& - \phi \omega \nu_\text{tra} \beta^i
+                \lambda^i S^i - \text{Vac} S^i + \text{WE} S_{W2}^i +
                 \text{WE} S_{W3}^i \\
-            \frac{dS_F^i}{dt} &=& - \phi \omega \nu_\text{tra,F}\beta^i
-                \sum_{j} \nu_\text{inf,F}C^{ij}S_F^i\Big(I_F^j +
-                \tau^j A_F^j \Big) + \text{Vac} S^i - \text{VacB} S_F^i
+            \frac{dS_F^i}{dt} &=& - \phi \omega \nu_\text{tra,F} \beta^i
+                \lambda^i S_F^i + \text{Vac} S^i - \text{VacB} S_F^i
                 - \text{WE} S_F^i \\
             \frac{dS_B^i}{dt} &=& - \phi \omega \nu_\text{tra,B}
-                \beta^i \sum_{j} \nu_\text{inf,B}C^{ij}S_B^i\Big(I_B^j
-                + \tau^j A_B^j \Big) + \text{VacB} S_F^i + \text{VacB}
+                \beta^i \lambda^i S_B^i + \text{VacB} S_F^i + \text{VacB}
                 S_{W1}^i + \text{VacB} S_{W2}^i - \text{WE} S_B^i
                 + \epsilon \text{VacB} R^i\\
             \frac{dS_{W1}^i}{dt} &=& - \phi \omega \nu_\text{tra,W1}
-                \beta^i \sum_{j} \nu_\text{inf,W1}C^{ij}S_{W1}^i
-                \Big(I_{W1}^j + \tau^j A_{W1}^j\Big) - \text{VacB}
+                \beta^i \lambda^i S_{W1}^i - \text{VacB}
                 S_{W1}^i - \text{WE} S_{W1}^i + \text{WE} S_B^i +
                 \text{WE} R^i \\
             \frac{dS_{W2}^i}{dt} &=& - \phi \omega \nu_\text{tra,W2}
-                \beta^i \sum_{j} \nu_\text{inf,W2}C^{ij}S_{W2}^i
-                \Big(I_{W2}^j + \tau^j A_{W2}^j\Big) - \text{VacB}
+                \beta^i \lambda^i S_{W2}^i - \text{VacB}
                 S_{W2}^i - \text{WE} S_{W2}^i + \text{WE} S_F^i +
                 \text{WE} S_{W1}^i - \text{WE3} S_{W2}^i \\
             \frac{dS_{W3}^i}{dt} &=& - \phi \omega \nu_\text{tra,W3}
-                \beta^i \sum_{j} \nu_\text{inf,W3}C^{ij}S_{W3}^i
-                \Big(I_{W3}^j + \tau^j A_{W3}^j\Big) - \text{WE} S_{W3}^i +
+                \beta^i \lambda^i S_{W3}^i - \text{WE} S_{W3}^i +
                 \text{WE3} S_{W2}^i \\
-            \frac{dE_1^i}{dt} &=& \phi \omega \nu_\text{tra}\beta^i
-                \sum_{j} \nu_\text{inf}C^{ij}S^i\Big(I^j +
-                \tau^j A^j\Big) - \alpha E_1^i \\
+            \frac{dE_1^i}{dt} &=& \phi \omega \nu_\text{tra} \beta^i
+                \lambda^i S^i - \alpha E_1^i \\
             \frac{dE_2^i}{dt} &=& \alpha (E_1^i - E_2^i) \\
             \frac{dE_3^i}{dt} &=& \alpha (E_2^i - E_3^i) \\
             \frac{dE_4^i}{dt} &=& \alpha (E_3^i - E_4^i) \\
             \frac{dE_5^i}{dt} &=& \alpha (E_4^i - E_5^i) \\
             \frac{dE_{1,F}^i}{dt} &=& \phi \omega \nu_\text{tra,F}
-                \beta^i \sum_{j} \nu_\text{inf,F}C^{ij}S_F^i\Big(I_F^j
-                + \tau^j A_F^j \Big) - \alpha E_{1,F}^i \\
+                \beta^i \lambda^i S_F^i - \alpha E_{1,F}^i \\
             \frac{dE_{2,F}^i}{dt} &=& \alpha (E_{1,F}^i -
                 E_{2,F}^i) \\
             \frac{dE_{3,F}^i}{dt} &=& \alpha (E_{2,F}^i -
@@ -103,8 +95,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             \frac{dE_{5,F}^i}{dt} &=& \alpha (E_{4,F}^i -
                 E_{5,F}^i) \\
             \frac{dE_{1,B}^i}{dt} &=& \phi \omega \nu_\text{tra,B}
-                \beta^i \sum_{j} \nu_\text{inf,B}C^{ij}S_B^i\Big(I_B^j
-                + \tau^j A_B^j \Big) - \alpha E_{1,B}^i \\
+                \beta^i \lambda^i S_B^i - \alpha E_{1,B}^i \\
             \frac{dE_{2,B}^i}{dt} &=& \alpha (E_{1,B}^i -
                 E_{2,B}^i) \\
             \frac{dE_{3,B}^i}{dt} &=& \alpha (E_{2,B}^i -
@@ -114,9 +105,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             \frac{dE_{5,B}^i}{dt} &=& \alpha (E_{4,B}^i -
                 E_{5,B}^i) \\
             \frac{dE_{1,W1}^i}{dt} &=& \phi \omega \nu_\text{tra,W1}
-                \beta^i \sum_{j} \nu_\text{inf,W1}C^{ij}S_{W1}^i
-                \Big(I_{W1}^j + \tau^j A_{W1}^j\Big) -
-                \alpha E_{1,W1}^i \\
+                \beta^i \lambda^i S_{W1}^i - \alpha E_{1,W1}^i \\
             \frac{dE_{2,W1}^i}{dt} &=& \alpha (E_{1,W1}^i -
                 E_{2,W1}^i) \\
             \frac{dE_{3,W1}^i}{dt} &=& \alpha (E_{2,W1}^i -
@@ -126,9 +115,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             \frac{dE_{5,W1}^i}{dt} &=& \alpha (E_{4,W1}^i -
                 E_{5,W1}^i) \\
             \frac{dE_{1,W2}^i}{dt} &=& \phi \omega \nu_\text{tra,W2}
-                \beta^i \sum_{j} \nu_\text{inf,W2}C^{ij}S_{W2}^i
-                \Big(I_{W2}^j + \tau^j A_{W2}^j\Big) -
-                \alpha E_{1,W2}^i \\
+                \beta^i \lambda^i S_{W2}^i - \alpha E_{1,W2}^i \\
             \frac{dE_{2,W2}^i}{dt} &=& \alpha (E_{1,W2}^i -
                 E_{2,W2}^i) \\
             \frac{dE_{3,W2}^i}{dt} &=& \alpha (E_{2,W2}^i -
@@ -138,9 +125,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             \frac{dE_{5,W2}^i}{dt} &=& \alpha (E_{4,W2}^i -
                 E_{5,W2}^i) \\
             \frac{dE_{1,W3}^i}{dt} &=& \phi \omega \nu_\text{tra,W3}
-                \beta^i \sum_{j} \nu_\text{inf,W3}C^{ij}S_{W3}^i
-                \Big(I_{W3}^j + \tau^j A_{W3}^j\Big) -
-                \alpha E_{1,W3}^i \\
+                \beta^i \lambda^i S_{W3}^i - \alpha E_{1,W3}^i \\
             \frac{dE_{2,W3}^i}{dt} &=& \alpha (E_{1,W3}^i -
                 E_{2,W3}^i) \\
             \frac{dE_{3,W3}^i}{dt} &=& \alpha (E_{2,W3}^i -
@@ -392,61 +377,62 @@ class WarwickLancSEIRModel(pints.ForwardModel):
 
         """
         # Read in the number of age-groups
-        a = num_a_groups
+        n = num_a_groups
 
         # Split compartments into their types
         # S, Sf, Sb, Sw1, Sw2, Sw3
         s, sF, sB, sW1, sW2, sW3 = (
-            y[:a], y[a:(2*a)], y[(2*a):(3*a)],
-            y[(3*a):(4*a)], y[(4*a):(5*a)], y[(5*a):(6*a)])
+            y[:n], y[n:(2*n)], y[(2*n):(3*n)],
+            y[(3*n):(4*n)], y[(4*n):(5*n)], y[(5*n):(6*n)])
 
         # E1, ..., E5
         e1, e2, e3, e4, e5 = (
-            y[(6*a):(7*a)], y[(7*a):(8*a)], y[(8*a):(9*a)],
-            y[(9*a):(10*a)], y[(10*a):(11*a)])
+            y[(6*n):(7*n)], y[(7*n):(8*n)], y[(8*n):(9*n)],
+            y[(9*n):(10*n)], y[(10*n):(11*n)])
 
         # E1f, ..., E5f
         e1F, e2F, e3F, e4F, e5F = (
-            y[(11*a):(12*a)], y[(12*a):(13*a)], y[(13*a):(14*a)],
-            y[(14*a):(15*a)], y[(15*a):(16*a)])
+            y[(11*n):(12*n)], y[(12*n):(13*n)], y[(13*n):(14*n)],
+            y[(14*n):(15*n)], y[(15*n):(16*n)])
 
         # E1b, ... E5b
         e1B, e2B, e3B, e4B, e5B = (
-            y[(16*a):(17*a)], y[(17*a):(18*a)], y[(18*a):(19*a)],
-            y[(19*a):(20*a)], y[(20*a):(21*a)])
+            y[(16*n):(17*n)], y[(17*n):(18*n)], y[(18*n):(19*n)],
+            y[(19*n):(20*n)], y[(20*n):(21*n)])
 
         # E1w1, ... E5w1
         e1W1, e2W1, e3W1, e4W1, e5W1 = (
-            y[(21*a):(22*a)], y[(22*a):(23*a)], y[(23*a):(24*a)],
-            y[(24*a):(25*a)], y[(25*a):(26*a)])
+            y[(21*n):(22*n)], y[(22*n):(23*n)], y[(23*n):(24*n)],
+            y[(24*n):(25*n)], y[(25*n):(26*n)])
 
         # E1w2, ... E5w2
         e1W2, e2W2, e3W2, e4W2, e5W2 = (
-            y[(26*a):(27*a)], y[(27*a):(28*a)], y[(28*a):(29*a)],
-            y[(29*a):(30*a)], y[(30*a):(31*a)])
+            y[(26*n):(27*n)], y[(27*n):(28*n)], y[(28*n):(29*n)],
+            y[(29*n):(30*n)], y[(30*n):(31*n)])
 
         # E1w3, ... E5w3
         e1W3, e2W3, e3W3, e4W3, e5W3 = (
-            y[(31*a):(32*a)], y[(32*a):(33*a)], y[(33*a):(34*a)],
-            y[(34*a):(35*a)], y[(35*a):(36*a)])
+            y[(31*n):(32*n)], y[(32*n):(33*n)], y[(33*n):(34*n)],
+            y[(34*n):(35*n)], y[(35*n):(36*n)])
 
         # If, Ib, Iw1, Iw2, Iw3
         i, iF, iB, iW1, iW2, iW3 = (
-            y[(36*a):(37*a)], y[(37*a):(38*a)], y[(38*a):(39*a)],
-            y[(39*a):(40*a)], y[(40*a):(41*a)], y[(41*a):(42*a)])
+            y[(36*n):(37*n)], y[(37*n):(38*n)], y[(38*n):(39*n)],
+            y[(39*n):(40*n)], y[(40*n):(41*n)], y[(41*n):(42*n)])
 
         # A, Af, Ab, Aw1, Aw2, R
         a, aF, aB, aW1, aW2, aW3, _ = (
-            y[(42*a):(43*a)], y[(43*a):(44*a)], y[(44*a):(45*a)],
-            y[(45*a):(46*a)], y[(46*a):(47*a)], y[(47*a):(48*a)],
-            y[(48*a):])
+            y[(42*n):(43*n)], y[(43*n):(44*n)], y[(44*n):(45*n)],
+            y[(45*n):(46*n)], y[(46*n):(47*n)], y[(47*n):(48*n)],
+            y[(48*n):])
 
         # Read the social distancing parameters of the system
         phi_all = self.social_distancing_param
         phi = phi_all[r-1]
 
         # Read the vaccination parameters of the system
-        vac_all, vacb_all, nu_tra, nu_symp, nu_inf = self.vaccine_param[:5]
+        vac_all, vacb_all, adult, nu_tra, nu_symp, nu_inf = \
+            self.vaccine_param[:6]
 
         vac, vacb = vac_all[r-1], vacb_all[r-1]
 
@@ -462,75 +448,77 @@ class WarwickLancSEIRModel(pints.ForwardModel):
 
         # Write actual RHS
         lam = nu_inf[0] * np.multiply(beta, np.dot(
-            cont_mat, np.asarray(i) + tau * np.asarray(a)))
-        lam_times_s = omega * phi * nu_tra[0] * np.multiply(
-            np.multiply(s, (1 / self._N[r-1])), lam)
+            cont_mat, np.multiply(
+                np.asarray(i) + tau * np.asarray(a), (1 / self._N[r-1]))))
+        lam += nu_inf[1] * np.multiply(beta, np.dot(
+            cont_mat, np.multiply(
+                np.asarray(iF) + tau * np.asarray(aF), (1 / self._N[r-1]))))
+        lam += nu_inf[2] * np.multiply(beta, np.dot(
+            cont_mat, np.multiply(
+                np.asarray(iB) + tau * np.asarray(aB), (1 / self._N[r-1]))))
+        lam += nu_inf[3] * np.multiply(beta, np.dot(
+            cont_mat, np.multiply(
+                np.asarray(iW1) + tau * np.asarray(aW1), (1 / self._N[r-1]))))
+        lam += nu_inf[4] * np.multiply(beta, np.dot(
+            cont_mat, np.multiply(
+                np.asarray(iW2) + tau * np.asarray(aW2), (1 / self._N[r-1]))))
+        lam += nu_inf[5] * np.multiply(beta, np.dot(
+            cont_mat, np.multiply(
+                np.asarray(iW3) + tau * np.asarray(aW3), (1 / self._N[r-1]))))
 
-        lam_F = nu_inf[1] * np.multiply(beta, np.dot(
-            cont_mat, np.asarray(iF) + tau * np.asarray(aF)))
-        lam_F_times_s = omega * phi * nu_tra[1] * np.multiply(
-            np.multiply(sF, (1 / self._N[r-1])), lam_F)
+        lam_times_s = omega * phi * nu_tra[0] * np.multiply(s, lam)
 
-        lam_B = nu_inf[2] * np.multiply(beta, np.dot(
-            cont_mat, np.asarray(iB) + tau * np.asarray(aB)))
-        lam_B_times_s = omega * phi * nu_tra[2] * np.multiply(
-            np.multiply(sB, (1 / self._N[r-1])), lam_B)
+        lam_times_sF = omega * phi * nu_tra[1] * np.multiply(sF, lam)
 
-        lam_W1 = nu_inf[3] * np.multiply(beta, np.dot(
-            cont_mat, np.asarray(iW1) + tau * np.asarray(aW1)))
-        lam_W1_times_s = omega * phi * nu_tra[3] * np.multiply(
-            np.multiply(sW1, (1 / self._N[r-1])), lam_W1)
+        lam_times_sB = omega * phi * nu_tra[2] * np.multiply(sB, lam)
 
-        lam_W2 = nu_inf[4] * np.multiply(beta, np.dot(
-            cont_mat, np.asarray(iW2) + tau * np.asarray(aW2)))
-        lam_W2_times_s = omega * phi * nu_tra[4] * np.multiply(
-            np.multiply(sW2, (1 / self._N[r-1])), lam_W2)
+        lam_times_sW1 = omega * phi * nu_tra[3] * np.multiply(sW1, lam)
 
-        lam_W3 = nu_inf[5] * np.multiply(beta, np.dot(
-            cont_mat, np.asarray(iW3) + tau * np.asarray(aW3)))
-        lam_W3_times_s = omega * phi * nu_tra[5] * np.multiply(
-            np.multiply(sW3, (1 / self._N[r-1])), lam_W3)
+        lam_times_sW2 = omega * phi * nu_tra[4] * np.multiply(sW2, lam)
+
+        lam_times_sW3 = omega * phi * nu_tra[5] * np.multiply(sW3, lam)
 
         dydt = np.concatenate((
-            -lam_times_s - vac * np.asarray(s) + we1 * np.asarray(
+            -lam_times_s - vac * np.multiply(adult, s) + we1 * np.asarray(
                 sW2) + we1 * np.asarray(sW3),
-            -lam_F_times_s + vac * np.asarray(s) - we1 * np.asarray(
-                sF) - vacb * np.asarray(sF),
-            -lam_B_times_s + vacb * np.asarray(sF) + vacb * np.array(
-                sW1) + vacb * np.array(sW2) + self._eps * vacb * np.array(
-                _) - we1 * np.asarray(sB),
-            -lam_W1_times_s - we1 * np.asarray(sW1) + we1 * np.array(
-                sB) - vacb * np.asarray(sW1) + we1 * np.array(_),
-            -lam_W2_times_s - vacb * np.asarray(sW2) + we1 * np.asarray(
+            -lam_times_sF + vac * np.multiply(adult, s) - we1 * np.asarray(
+                sF) - vacb * np.multiply(adult, sF),
+            -lam_times_sB + vacb * np.multiply(adult, sF) + vacb * np.multiply(
+                adult, sW1) + vacb * np.multiply(
+                adult, sW2) + self._eps * vacb * np.multiply(
+                adult, _) - we1 * np.asarray(sB),
+            -lam_times_sW1 - we1 * np.asarray(sW1) + we1 * np.array(
+                sB) - vacb * np.multiply(adult, sW1) + we1 * np.array(_),
+            -lam_times_sW2 - vacb * np.multiply(adult, sW2) + we1 * np.asarray(
                 sF) + we1 * np.asarray(sW1) - we1 * np.asarray(
                 sW2) - we3 * np.asarray(sW2),
-            -lam_W3_times_s + we3 * np.asarray(sW2) - we1 * np.asarray(sW3),
+            -lam_times_sW3 + we3 * np.asarray(sW2) - we1 * np.asarray(sW3),
             lam_times_s - alpha * np.asarray(e1),
             alpha * (np.asarray(e1) - np.asarray(e2)),
             alpha * (np.asarray(e2) - np.asarray(e3)),
             alpha * (np.asarray(e3) - np.asarray(e4)),
             alpha * (np.asarray(e4) - np.asarray(e5)),
-            lam_F_times_s - alpha * np.asarray(e1F),
+            lam_times_sF - alpha * np.asarray(e1F),
             alpha * (np.asarray(e1F) - np.asarray(e2F)),
             alpha * (np.asarray(e2F) - np.asarray(e3F)),
             alpha * (np.asarray(e3F) - np.asarray(e4F)),
             alpha * (np.asarray(e4F) - np.asarray(e5F)),
-            lam_B_times_s - alpha * np.asarray(e1B),
+            lam_times_sB - alpha * np.asarray(e1B),
             alpha * (np.asarray(e1B) - np.asarray(e2B)),
             alpha * (np.asarray(e2B) - np.asarray(e3B)),
             alpha * (np.asarray(e3B) - np.asarray(e4B)),
             alpha * (np.asarray(e4B) - np.asarray(e5B)),
-            lam_W1_times_s - alpha * np.asarray(e1W1),
+            lam_times_sW1 - alpha * np.asarray(e1W1),
             alpha * (np.asarray(e1W1) - np.asarray(e2W1)),
             alpha * (np.asarray(e2W1) - np.asarray(e3W1)),
             alpha * (np.asarray(e3W1) - np.asarray(e4W1)),
             alpha * (np.asarray(e4W1) - np.asarray(e5W1)),
-            lam_W2_times_s - alpha * np.asarray(e1W2),
+            lam_times_sW2 - alpha * np.asarray(e1W2),
             alpha * (np.asarray(e1W2) - np.asarray(e2W2)),
             alpha * (np.asarray(e2W2) - np.asarray(e3W2)),
             alpha * (np.asarray(e3W2) - np.asarray(e4W2)),
             alpha * (np.asarray(e4W2) - np.asarray(e5W2)),
-            lam_W3_times_s - alpha * np.asarray(e1W3),
+            lam_times_sW3 - alpha * np.asarray(e1W3),
             alpha * (np.asarray(e1W3) - np.asarray(e2W3)),
             alpha * (np.asarray(e2W3) - np.asarray(e3W3)),
             alpha * (np.asarray(e3W3) - np.asarray(e4W3)),
@@ -565,7 +553,8 @@ class WarwickLancSEIRModel(pints.ForwardModel):
                 np.asarray(aF) + np.asarray(iB) + np.asarray(aB) +
                 np.asarray(iW1) + np.asarray(aW1) + np.asarray(iW2) +
                 np.asarray(aW2) + np.asarray(iW3) + np.asarray(aW3)
-                ) - we1 * np.asarray(_) - self._eps * vacb * np.array(_)
+                ) - we1 * np.asarray(_) - self._eps * vacb * np.multiply(
+                adult, _)
             ))
 
         return dydt
@@ -952,7 +941,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
 
         # Read parameters of the system
         alpha, d = self._c[1], self._c[3]
-        nu_symp = self.vaccine_param[3]
+        nu_symp = self.vaccine_param[4]
 
         d_infec = np.empty((self._times.shape[0], self._num_ages))
         d_infec_F = np.empty((self._times.shape[0], self._num_ages))
@@ -1071,7 +1060,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
 
         """
         # Read parameters of the system
-        nu_sev_h = self.vaccine_param[5]
+        nu_sev_h = self.vaccine_param[6]
 
         n_daily_hosp = np.zeros((self._times.shape[0], self._num_ages))
         n_daily_hosp_F = np.zeros((self._times.shape[0], self._num_ages))
@@ -1247,7 +1236,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
 
         """
         # Read parameters of the system
-        nu_sev_d = self.vaccine_param[6]
+        nu_sev_d = self.vaccine_param[7]
 
         n_daily_dths = np.zeros((self._times.shape[0], self._num_ages))
         n_daily_dths_F = np.zeros((self._times.shape[0], self._num_ages))

@@ -1347,6 +1347,7 @@ class TestVaccineParameters(unittest.TestCase):
 
         vac = 3
         vacb = 0.5
+        adult = [0, 0.9]
         nu_tra = [1] * 6
         nu_symp = [1] * 6
         nu_inf = [1] * 6
@@ -1357,6 +1358,7 @@ class TestVaccineParameters(unittest.TestCase):
             model=model,
             vac=vac,
             vacb=vacb,
+            adult=adult,
             nu_tra=nu_tra,
             nu_symp=nu_symp,
             nu_inf=nu_inf,
@@ -1367,6 +1369,7 @@ class TestVaccineParameters(unittest.TestCase):
         self.assertEqual(VaccineParam.model, model)
         npt.assert_array_equal(VaccineParam.vac, np.array([3, 3]))
         npt.assert_array_equal(VaccineParam.vacb, np.array([0.5, 0.5]))
+        npt.assert_array_equal(VaccineParam.adult, np.array([0, 0.9]))
         npt.assert_array_equal(VaccineParam.nu_tra, np.ones(6))
         npt.assert_array_equal(VaccineParam.nu_symp, np.ones(6))
         npt.assert_array_equal(VaccineParam.nu_inf, np.ones(6))
@@ -1380,6 +1383,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model1,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1392,6 +1396,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac={'0.9': 0},
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1404,6 +1409,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=[[0.4], [0.3]],
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1416,6 +1422,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=[0.5, 0.9, 1],
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1428,6 +1435,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=[0.5, '0.2'],
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1440,6 +1448,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=[-3, 0.2],
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1452,6 +1461,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb={'0.9': 0},
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1464,6 +1474,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=[[0.4], [0.3]],
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1476,6 +1487,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=[0.5, 0.9, 1],
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1488,6 +1500,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=[0.5, '0.2'],
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1500,6 +1513,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=[-3, 0.2],
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1512,6 +1526,72 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=[[0], [0.9]],
+                nu_tra=nu_tra,
+                nu_symp=nu_symp,
+                nu_inf=nu_inf,
+                nu_sev_h=nu_sev_h,
+                nu_sev_d=nu_sev_d
+            )
+
+        with self.assertRaises(ValueError):
+            wm.VaccineParameters(
+                model=model,
+                vac=vac,
+                vacb=vacb,
+                adult=[0, 0.9, 1],
+                nu_tra=nu_tra,
+                nu_symp=nu_symp,
+                nu_inf=nu_inf,
+                nu_sev_h=nu_sev_h,
+                nu_sev_d=nu_sev_d
+            )
+
+        with self.assertRaises(TypeError):
+            wm.VaccineParameters(
+                model=model,
+                vac=vac,
+                vacb=vacb,
+                adult=[0, '0.9'],
+                nu_tra=nu_tra,
+                nu_symp=nu_symp,
+                nu_inf=nu_inf,
+                nu_sev_h=nu_sev_h,
+                nu_sev_d=nu_sev_d
+            )
+
+        with self.assertRaises(ValueError):
+            wm.VaccineParameters(
+                model=model,
+                vac=vac,
+                vacb=vacb,
+                adult=[1, -0.9],
+                nu_tra=nu_tra,
+                nu_symp=nu_symp,
+                nu_inf=nu_inf,
+                nu_sev_h=nu_sev_h,
+                nu_sev_d=nu_sev_d
+            )
+
+        with self.assertRaises(ValueError):
+            wm.VaccineParameters(
+                model=model,
+                vac=vac,
+                vacb=vacb,
+                adult=[0, 1.9],
+                nu_tra=nu_tra,
+                nu_symp=nu_symp,
+                nu_inf=nu_inf,
+                nu_sev_h=nu_sev_h,
+                nu_sev_d=nu_sev_d
+            )
+
+        with self.assertRaises(ValueError):
+            wm.VaccineParameters(
+                model=model,
+                vac=vac,
+                vacb=vacb,
+                adult=adult,
                 nu_tra={'0.9': 0},
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1524,6 +1604,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=[[0.4], [0.3], [1], [1], [1], [1]],
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1536,6 +1617,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=[0.5, 0.9, 1, 1, 1, 1, 1],
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1548,6 +1630,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=[0.5, '0.2', 1, 1, 1, 1],
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1560,6 +1643,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=[-3, 0.2, 1, 1, 1, 1],
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1572,6 +1656,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp={'0.9': 0},
                 nu_inf=nu_inf,
@@ -1584,6 +1669,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=[[0.4], [0.3], [1], [1], [1], [1]],
                 nu_inf=nu_inf,
@@ -1596,6 +1682,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=[0.5, 0.9, 1, 1, 1, 1, 1],
                 nu_inf=nu_inf,
@@ -1608,6 +1695,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=[0.5, '0.2', 1, 1, 1, 1],
                 nu_inf=nu_inf,
@@ -1620,6 +1708,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=[-3, 0.2, 1, 1, 1, 1],
                 nu_inf=nu_inf,
@@ -1632,6 +1721,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf={'0.9': 0},
@@ -1644,6 +1734,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=[[0.4], [0.3], [1], [1], [1], [1]],
@@ -1656,6 +1747,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=[0.5, 0.9, 1, 1, 1, 1, 1],
@@ -1668,6 +1760,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=[0.5, '0.2', 1, 1, 1, 1],
@@ -1680,6 +1773,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=[-3, 0.2, 1, 1, 1, 1],
@@ -1692,6 +1786,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1704,6 +1799,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1716,6 +1812,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1728,6 +1825,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1740,6 +1838,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1752,6 +1851,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1764,6 +1864,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1776,6 +1877,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1788,6 +1890,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vvac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1800,6 +1903,7 @@ class TestVaccineParameters(unittest.TestCase):
                 model=model,
                 vac=vac,
                 vacb=vacb,
+                adult=adult,
                 nu_tra=nu_tra,
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
@@ -1813,6 +1917,7 @@ class TestVaccineParameters(unittest.TestCase):
         # Set vaccine-specific parameters
         vac = [3, 2]
         vacb = [0.5, 1]
+        adult = [0, 0.9]
         nu_tra = [1] * 6
         nu_symp = [1] * 6
         nu_inf = [1] * 6
@@ -1823,6 +1928,7 @@ class TestVaccineParameters(unittest.TestCase):
             model=model,
             vac=vac,
             vacb=vacb,
+            adult=adult,
             nu_tra=nu_tra,
             nu_symp=nu_symp,
             nu_inf=nu_inf,
@@ -1830,7 +1936,9 @@ class TestVaccineParameters(unittest.TestCase):
             nu_sev_d=nu_sev_d
         )
 
-        self.assertEqual(VaccineParam(), [[3, 2], [0.5, 1]] + [[1] * 6] * 5)
+        self.assertEqual(
+            VaccineParam(),
+            [[3, 2], [0.5, 1], [0, 0.9]] + [[1] * 6] * 5)
 
 #
 # Test ParametersController Class
@@ -1894,6 +2002,7 @@ class TestParametersController(unittest.TestCase):
             model=model,
             vac=[3, 3],
             vacb=[0.5, 0.5],
+            adult=[0, 0.9],
             nu_tra=[1] * 6,
             nu_symp=[1] * 6,
             nu_inf=[1] * 6,
@@ -1921,7 +2030,7 @@ class TestParametersController(unittest.TestCase):
         self.assertEqual(parameters.simulation_parameters,
                          simulation_parameters)
         self.assertEqual(parameters.vaccine_parameters(),
-                         [[3, 3], [0.5, 0.5],
+                         [[3, 3], [0.5, 0.5], [0, 0.9],
                          [1] * 6, [1] * 6, [1] * 6, [1] * 6, [1] * 6])
         npt.assert_array_equal(parameters.soc_dist_parameters(),
                                np.array([1, 1]))
@@ -2139,6 +2248,7 @@ class TestParametersController(unittest.TestCase):
                 model=examplemodel2,
                 vac=3,
                 vacb=0.5,
+                adult=[0, 0.9],
                 nu_tra=[1] * 6,
                 nu_symp=[1] * 6,
                 nu_inf=[1] * 6,
@@ -2240,6 +2350,7 @@ class TestParametersController(unittest.TestCase):
             model=model,
             vac=3,
             vacb=0.5,
+            adult=[0, 0.9],
             nu_tra=[1] * 6,
             nu_symp=[1] * 6,
             nu_inf=[1] * 6,
