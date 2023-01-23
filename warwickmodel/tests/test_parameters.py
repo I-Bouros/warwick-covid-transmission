@@ -798,7 +798,7 @@ class TestDiseaseParameters(unittest.TestCase):
 
         d = [0.05, 0.02]
         tau = 0.4
-        we = [0.02, 0]
+        we = [0.02, 0.01, 0]
         omega = 1
 
         DiseaseParameters = wm.DiseaseParameters(
@@ -812,7 +812,7 @@ class TestDiseaseParameters(unittest.TestCase):
         self.assertEqual(DiseaseParameters.model, model)
         npt.assert_array_equal(DiseaseParameters.d, np.array([0.05, 0.02]))
         self.assertEqual(DiseaseParameters.tau, 0.4)
-        npt.assert_array_equal(DiseaseParameters.we, np.array([0.02, 0]))
+        npt.assert_array_equal(DiseaseParameters.we, np.array([0.02, 0.01, 0]))
         self.assertEqual(DiseaseParameters.omega, 1)
 
         with self.assertRaises(TypeError):
@@ -915,7 +915,7 @@ class TestDiseaseParameters(unittest.TestCase):
             )
 
         with self.assertRaises(TypeError):
-            we1 = ['0.4', 0.2]
+            we1 = ['0.4', 0, 0.2]
 
             wm.DiseaseParameters(
                 model=model,
@@ -926,7 +926,7 @@ class TestDiseaseParameters(unittest.TestCase):
             )
 
         with self.assertRaises(ValueError):
-            we1 = [[0.2], [0.4]]
+            we1 = [[0.2], [0], [0.4]]
 
             wm.DiseaseParameters(
                 model=model,
@@ -937,7 +937,7 @@ class TestDiseaseParameters(unittest.TestCase):
             )
 
         with self.assertRaises(ValueError):
-            we1 = [0.2, 0.4, 0.7]
+            we1 = [0.2, 0.4, 0.7, 0]
 
             wm.DiseaseParameters(
                 model=model,
@@ -959,7 +959,7 @@ class TestDiseaseParameters(unittest.TestCase):
             )
 
         with self.assertRaises(ValueError):
-            we1 = [-0.2, 1.3]
+            we1 = [-0.2, 1.3, 0]
 
             wm.DiseaseParameters(
                 model=model,
@@ -996,7 +996,7 @@ class TestDiseaseParameters(unittest.TestCase):
 
         d = [0.05, 0.02]
         tau = 0.4
-        we = [0.02, 0]
+        we = [0.02, 0.02, 0]
         omega = 1
 
         DiseaseParameters = wm.DiseaseParameters(
@@ -1008,7 +1008,7 @@ class TestDiseaseParameters(unittest.TestCase):
         )
 
         self.assertEqual(DiseaseParameters(),
-                         [[0.05, 0.02], 0.4, [0.02, 0], 1])
+                         [[0.05, 0.02], 0.4, [0.02, 0.02, 0], 1])
 
 #
 # Test Transmission Class
@@ -1977,7 +1977,7 @@ class TestParametersController(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
@@ -2325,7 +2325,7 @@ class TestParametersController(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
@@ -2391,5 +2391,6 @@ class TestParametersController(unittest.TestCase):
              10, 20, 0, 5, 10, 20, 0, 5, 10, 20, 0, 5, 0, 0, 0, 0,
              15, 10, 30, 10, 15, 10, 30, 10, 15, 10, 30, 10,
              15, 10, 30, 10, 15, 10, 30, 10, 0, 0, 0, 0, 0, 0, 0, 0,
-             0.5, 0.5, 0.5, 1, 1, 0.4, 0.4, 0.4, 0.02, 0, 1, 'RK45', False]
+             0.5, 0.5, 0.5, 1, 1, 0.4, 0.4, 0.4, 0.02, 0.02, 0, 1, 'RK45',
+             False]
         )

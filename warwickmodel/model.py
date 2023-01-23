@@ -58,25 +58,27 @@ class WarwickLancSEIRModel(pints.ForwardModel):
 
         \begin{eqnarray}
             \frac{dS^i}{dt} &=& - \phi \omega \nu_\text{tra} \beta^i
-                \lambda^i S^i - \text{Vac} S^i + \text{WE} S_{W2}^i +
-                \text{WE} S_{W3}^i \\
+                \lambda^i S^i - \text{Vac} S^i -\text{VacB} S^i +
+                \text{WE2} S_{W2}^i + \text{WE} S_{W3}^i \\
             \frac{dS_F^i}{dt} &=& - \phi \omega \nu_\text{tra,F} \beta^i
-                \lambda^i S_F^i + \text{Vac} S^i - \text{VacB} S_F^i
-                - \text{WE} S_F^i \\
+                \lambda^i S_F^i + \text{Vac} S^i + \text{Vac} S_{W1}^i +
+                \text{Vac} S_{W2}^i + \text{Vac} S_{W3}^i -
+                \text{VacB} S_F^i - \text{WE} S_F^i \\
             \frac{dS_B^i}{dt} &=& - \phi \omega \nu_\text{tra,B}
                 \beta^i \lambda^i S_B^i + \text{VacB} S_F^i + \text{VacB}
-                S_{W1}^i + \text{VacB} S_{W2}^i - \text{WE} S_B^i
-                + \epsilon \text{VacB} R^i\\
+                S_{W1}^i + \text{VacB} S_{W2}^i + \text{VacB} S_{W3}^i -
+                \text{WE} S_B^i + \epsilon \text{VacB} R^i\\
             \frac{dS_{W1}^i}{dt} &=& - \phi \omega \nu_\text{tra,W1}
-                \beta^i \lambda^i S_{W1}^i - \text{VacB}
-                S_{W1}^i - \text{WE} S_{W1}^i + \text{WE} S_B^i +
+                \beta^i \lambda^i S_{W1}^i - \text{Vac} S_{W1}^i -
+                \text{VacB} S_{W1}^i - \text{WE} S_{W1}^i + \text{WE} S_B^i +
                 \text{WE} R^i \\
             \frac{dS_{W2}^i}{dt} &=& - \phi \omega \nu_\text{tra,W2}
-                \beta^i \lambda^i S_{W2}^i - \text{VacB}
-                S_{W2}^i - \text{WE} S_{W2}^i + \text{WE} S_F^i +
+                \beta^i \lambda^i S_{W2}^i - \text{Vac} S_{W2}^i -
+                \text{VacB} S_{W2}^i - \text{WE2} S_{W2}^i + \text{WE} S_F^i +
                 \text{WE} S_{W1}^i - \text{WE3} S_{W2}^i \\
             \frac{dS_{W3}^i}{dt} &=& - \phi \omega \nu_\text{tra,W3}
-                \beta^i \lambda^i S_{W3}^i - \text{WE} S_{W3}^i +
+                \beta^i \lambda^i S_{W3}^i - \text{Vac} S_{W3}^i -
+                \text{VacB} S_{W3}^i - \text{WE} S_{W3}^i +
                 \text{WE3} S_{W2}^i \\
             \frac{dE_1^i}{dt} &=& \phi \omega \nu_\text{tra} \beta^i
                 \lambda^i S^i - \alpha E_1^i \\
@@ -460,7 +462,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         beta, alpha, gamma, d, tau, we, omega = c
 
         # waning rates of the current & older variant respectively
-        we1, we3 = we
+        we1, we2, we3 = we
 
         # Identify the appropriate contact matrix for the ODE system
         cont_mat = \
@@ -499,20 +501,28 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         lam_times_sW3 = omega * phi * nu_tra[5] * np.multiply(sW3, lam)
 
         dydt = np.concatenate((
-            -lam_times_s - vac * np.multiply(adult, s) + we1 * np.asarray(
-                sW2) + we1 * np.asarray(sW3),
-            -lam_times_sF + vac * np.multiply(adult, s) - we1 * np.asarray(
+            -lam_times_s - vac * np.multiply(adult, s) - vacb * np.multiply(
+                adult, s) + we2 * np.asarray(sW2) + we1 * np.asarray(sW3),
+            -lam_times_sF + vac * np.multiply(adult, s) + vac * np.multiply(
+                adult, sW1) + vac * np.multiply(
+                adult, sW2) + vac * np.multiply(adult, sW3) - we1 * np.asarray(
                 sF) - vacb * np.multiply(adult, sF),
-            -lam_times_sB + vacb * np.multiply(adult, sF) + vacb * np.multiply(
+            -lam_times_sB + vacb * np.multiply(adult, s) + vacb * np.multiply(
+                adult, sF) + vacb * np.multiply(
                 adult, sW1) + vacb * np.multiply(
                 adult, sW2) + self._eps * vacb * np.multiply(
                 adult, _) - we1 * np.asarray(sB),
-            -lam_times_sW1 - we1 * np.asarray(sW1) + we1 * np.array(
-                sB) - vacb * np.multiply(adult, sW1) + we1 * np.array(_),
-            -lam_times_sW2 - vacb * np.multiply(adult, sW2) + we1 * np.asarray(
-                sF) + we1 * np.asarray(sW1) - we1 * np.asarray(
-                sW2) - we3 * np.asarray(sW2),
-            -lam_times_sW3 + we3 * np.asarray(sW2) - we1 * np.asarray(sW3),
+            -lam_times_sW1 - vac * np.multiply(
+                adult, sW1) - vacb * np.multiply(
+                adult, sW1) - we1 * np.asarray(sW1) + we1 * np.array(
+                sB) + we1 * np.array(_),
+            -lam_times_sW2 - vac * np.multiply(
+                adult, sW2) - vacb * np.multiply(
+                adult, sW2) + we1 * np.asarray(sF) + we1 * np.asarray(
+                sW1) - we2 * np.asarray(sW2) - we3 * np.asarray(sW2),
+            -lam_times_sW3 - vac * np.multiply(
+                adult, sW3) - vacb * np.multiply(
+                adult, sW3) + we3 * np.asarray(sW2) - we1 * np.asarray(sW3),
             lam_times_s - alpha * np.asarray(e1),
             alpha * (np.asarray(e1) - np.asarray(e2)),
             alpha * (np.asarray(e2) - np.asarray(e3)),
@@ -885,16 +895,16 @@ class WarwickLancSEIRModel(pints.ForwardModel):
 
         # we
         my_parameters.append(parameters[
-            (start_index + 2 + 3 * n_ages):(start_index + 4 + 3 * n_ages)])
+            (start_index + 2 + 3 * n_ages):(start_index + 5 + 3 * n_ages)])
 
         # omega
-        my_parameters.append(parameters[start_index + 4 + 3 * n_ages])
+        my_parameters.append(parameters[start_index + 5 + 3 * n_ages])
 
         # Add method
-        method = parameters[start_index + 5 + 3 * n_ages]
+        method = parameters[start_index + 6 + 3 * n_ages]
 
         # Add eps
-        self._eps = int(parameters[start_index + 6 + 3 * n_ages])
+        self._eps = int(parameters[start_index + 7 + 3 * n_ages])
 
         return self._split_simulate(my_parameters,
                                     times,

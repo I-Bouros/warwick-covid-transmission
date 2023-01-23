@@ -606,13 +606,13 @@ class DiseaseParameters(object):
                     dispalying symptoms must be <= 1.')
 
         if isinstance(we, (float, int)):
-            we = [we, 0]  # if we only model one variant
+            we = [we, we, 0]  # if we only model one variant
         if np.asarray(we).ndim != 1:
             raise ValueError('The rates of waning of immunity for current\
                 and an older variant storage format must be 1-dimensional.')
-        if np.asarray(we).shape[0] != 2:
+        if np.asarray(we).shape[0] != 3:
             raise ValueError(
-                    'Wrong number of Rates of waning of immunity for\
+                    'Wrong number of rates of waning of immunity for\
                     current and an older variant.')
         for _ in we:
             if not isinstance(_, (float, int)):

@@ -159,7 +159,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
@@ -274,7 +274,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
@@ -424,7 +424,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
@@ -561,7 +561,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
@@ -781,7 +781,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
@@ -924,7 +924,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
@@ -1150,7 +1150,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
@@ -1312,7 +1312,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
@@ -1426,7 +1426,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
@@ -1564,7 +1564,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
@@ -1722,7 +1722,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
@@ -1919,7 +1919,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model=model,
             d=0.4 * np.ones(len(age_groups)),
             tau=0.4,
-            we=[0.02, 0],
+            we=[0.02, 0.02, 0],
             omega=1
         )
 
