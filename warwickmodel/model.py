@@ -936,6 +936,84 @@ class WarwickLancSEIRModel(pints.ForwardModel):
                     raise TypeError(
                         'Model output elements must be integer or float.')
 
+    def new_total_infections(self, output):
+        """
+        Computes number of new (symptomatic + asymptomatic) infections at each
+        time step in specified region, given the simulated timeline of
+        susceptible number of individuals, for all age groups in the model.
+
+        It uses an output of the simulation method for the
+        WarwickLancSEIRModel, taking all the rest of the parameters necessary
+        for the computation from the way its simulation has been fitted.
+
+        Parameters
+        ----------
+        output : numpy.array
+            Age-structured output of the simulation method for the
+            WarwickLancSEIRModel.
+
+        Returns
+        -------
+        list of numpy.array
+            Age-structured matrices of the number of new (symptomatic +
+            asymptomatic)  infections for different vaccination statuses
+            (unvaccinated, fully-vaccinated, boosted, partially-waned,
+            fully-waned, previous-variant immunity) from the simulation method
+            for the WarwickLancSEIRModel.
+
+        Notes
+        -----
+        Always run :meth:`WarwickLancSEIRModel.simulate` before running this
+        one.
+
+        """
+        # Check correct format of parameters
+        self._check_output_format(output)
+
+        # Read parameters of the system
+        alpha = self._c[1]
+
+        d_tot_infec = np.empty((self._times.shape[0], self._num_ages))
+        d_tot_infec_F = np.empty((self._times.shape[0], self._num_ages))
+        d_tot_infec_B = np.empty((self._times.shape[0], self._num_ages))
+        d_tot_infec_W1 = np.empty((self._times.shape[0], self._num_ages))
+        d_tot_infec_W2 = np.empty((self._times.shape[0], self._num_ages))
+        d_tot_infec_W3 = np.empty((self._times.shape[0], self._num_ages))
+
+        for ind, _ in enumerate(self._times.tolist()):
+            # Read from output
+            e5 = output[ind, :][(10*self._num_ages):(11*self._num_ages)]
+            e5F = output[ind, :][(15*self._num_ages):(16*self._num_ages)]
+            e5B = output[ind, :][(20*self._num_ages):(21*self._num_ages)]
+            e5W1 = output[ind, :][(25*self._num_ages):(26*self._num_ages)]
+            e5W2 = output[ind, :][(30*self._num_ages):(31*self._num_ages)]
+            e5W3 = output[ind, :][(35*self._num_ages):(36*self._num_ages)]
+
+            # fraction of new infectives in delta_t time step
+            d_tot_infec[ind, :] = alpha * e5
+            d_tot_infec_F[ind, :] = alpha * e5F
+            d_tot_infec_B[ind, :] = alpha * e5B
+            d_tot_infec_W1[ind, :] = alpha * e5W1
+            d_tot_infec_W2[ind, :] = alpha * e5W2
+            d_tot_infec_W3[ind, :] = alpha * e5W3
+
+            if np.any(d_tot_infec[ind, :] < 0):  # pragma: no cover
+                d_tot_infec[ind, :] = np.zeros_like(d_tot_infec[ind, :])
+            if np.any(d_tot_infec_F[ind, :] < 0):  # pragma: no cover
+                d_tot_infec_F[ind, :] = np.zeros_like(d_tot_infec_F[ind, :])
+            if np.any(d_tot_infec_B[ind, :] < 0):  # pragma: no cover
+                d_tot_infec_B[ind, :] = np.zeros_like(d_tot_infec_B[ind, :])
+            if np.any(d_tot_infec_W1[ind, :] < 0):  # pragma: no cover
+                d_tot_infec_W1[ind, :] = np.zeros_like(d_tot_infec_W1[ind, :])
+            if np.any(d_tot_infec_W2[ind, :] < 0):  # pragma: no cover
+                d_tot_infec_W2[ind, :] = np.zeros_like(d_tot_infec_W2[ind, :])
+            if np.any(d_tot_infec[ind, :] < 0):  # pragma: no cover
+                d_tot_infec_W3[ind, :] = np.zeros_like(d_tot_infec_W3[ind, :])
+
+        return [
+            d_tot_infec, d_tot_infec_F, d_tot_infec_B,
+            d_tot_infec_W1, d_tot_infec_W2, d_tot_infec_W3]
+
     def new_infections(self, output):
         """
         Computes number of new symptomatic infections at each time step in

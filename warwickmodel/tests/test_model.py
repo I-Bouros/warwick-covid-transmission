@@ -218,6 +218,156 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
                 [7, 8] + [0, 0] * 49
             ]), decimal=3)
 
+    def test_new_total_infections(self):
+        model = wm.WarwickLancSEIRModel()
+
+        # Populate the model
+        regions = ['UK', 'FR']
+        age_groups = ['0-10', '10-25']
+
+        # Initial state of the system
+        region_data_matrix_0 = np.array([[1, 10], [1, 6]])
+        region_data_matrix_1 = np.array([[0.5, 3], [0.3, 3]])
+
+        regional_0 = em.RegionMatrix(
+            regions[0], age_groups, region_data_matrix_0)
+        regional_1 = em.RegionMatrix(
+            regions[1], age_groups, region_data_matrix_1)
+
+        contacts = em.ContactMatrix(
+            age_groups, np.ones((len(age_groups), len(age_groups))))
+        matrices_contact = [contacts]
+
+        # Matrices contact
+        time_changes_contact = [1]
+        time_changes_region = [1]
+
+        matrices_region = [[regional_0, regional_1]]
+
+        model.set_regions(regions)
+        model.set_age_groups(age_groups)
+        model.read_contact_data(matrices_contact, time_changes_contact)
+        model.read_regional_data(matrices_region, time_changes_region)
+
+        # Set regional and time dependent parameters
+        regional_parameters = wm.RegParameters(
+            model=model,
+            region_index=1
+        )
+
+        # Set ICs parameters
+        ICs_parameters = wm.ICs(
+            model=model,
+            susceptibles_IC=[[5, 6] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
+            recovered_IC=[[0, 0], [0, 0]]
+        )
+
+        # Set disease-specific parameters
+        disease_parameters = wm.DiseaseParameters(
+            model=model,
+            d=0.4 * np.ones(len(age_groups)),
+            tau=0.4,
+            we=[0.02, 0.02, 0],
+            omega=1
+        )
+
+        # Set transmission parameters
+        transmission_parameters = wm.Transmission(
+            model=model,
+            beta=0.5 * np.ones(len(age_groups)),
+            alpha=0.5,
+            gamma=1 * np.ones(len(age_groups))
+        )
+
+        # Set other simulation parameters
+        simulation_parameters = wm.SimParameters(
+            model=model,
+            method='RK45',
+            times=[1, 2],
+            eps=False
+        )
+
+        # Set vaccination parameters
+        vaccine_parameters = wm.VaccineParameters(
+            model=model,
+            vac=0,
+            vacb=0,
+            adult=[0, 0.9],
+            nu_tra=[1] * 6,
+            nu_symp=[1] * 6,
+            nu_inf=[1] * 6,
+            nu_sev_h=[1] * 6,
+            nu_sev_d=[1] * 6
+        )
+
+        # Set social distancing parameters
+        soc_dist_parameters = wm.SocDistParameters(
+            model=model,
+            phi=1
+        )
+
+        # Set all parameters in the controller
+        parameters = wm.ParametersController(
+            model=model,
+            regional_parameters=regional_parameters,
+            ICs_parameters=ICs_parameters,
+            disease_parameters=disease_parameters,
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
+
+        output = model.simulate(parameters)
+
+        npt.assert_array_equal(
+            model.new_total_infections(output)[0],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_total_infections(output)[1],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_total_infections(output)[2],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_total_infections(output)[3],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_total_infections(output)[4],
+            np.array([[0, 0], [0, 0]]))
+        npt.assert_array_equal(
+            model.new_total_infections(output)[5],
+            np.array([[0, 0], [0, 0]]))
+
+        with self.assertRaises(ValueError):
+            output1 = np.array([5, 6] + [0, 0] * 49)
+            model.new_total_infections(output1)
+
+        with self.assertRaises(ValueError):
+            output1 = np.array([
+                [5, 6] + [0, 0] * 48,
+                [5, 6] + [0, 0] * 48])
+            model.new_total_infections(output1)
+
+        with self.assertRaises(ValueError):
+            output1 = np.array([
+                [5, 6] + [0, 0] * 49,
+                [5, 6] + [0, 0] * 49,
+                [5, 6] + [0, 0] * 49])
+            model.new_total_infections(output1)
+
+        with self.assertRaises(TypeError):
+            output1 = np.array([
+                ['5', 6] + [0, 0] * 49,
+                [5, 6] + ['0', 0] * 49])
+            model.new_total_infections(output1)
+
     def test_new_infections(self):
         model = wm.WarwickLancSEIRModel()
 
