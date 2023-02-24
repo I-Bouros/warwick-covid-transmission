@@ -458,6 +458,66 @@ class TestICs(unittest.TestCase):
                 recovered_IC=recovered)
 
         with self.assertRaises(ValueError):
+            exposed51 = [0, 0]
+
+            wm.ICs(
+                model=model,
+                susceptibles_IC=susceptibles,
+                exposed1_IC=exposed1,
+                exposed2_IC=exposed2,
+                exposed3_IC=exposed3,
+                exposed4_IC=exposed4,
+                exposed5_IC=exposed51,
+                infectives_sym_IC=infectives_sym,
+                infectives_asym_IC=infectives_asym,
+                recovered_IC=recovered)
+
+        with self.assertRaises(ValueError):
+            exposed51 = [[0, 0] * 6, [0, 0] * 6, [0, 0] * 6]
+
+            wm.ICs(
+                model=model,
+                susceptibles_IC=susceptibles,
+                exposed1_IC=exposed1,
+                exposed2_IC=exposed2,
+                exposed3_IC=exposed3,
+                exposed4_IC=exposed4,
+                exposed5_IC=exposed51,
+                infectives_sym_IC=infectives_sym,
+                infectives_asym_IC=infectives_asym,
+                recovered_IC=recovered)
+
+        with self.assertRaises(ValueError):
+            exposed51 = [[0, 0, 0] * 6, [0, 0, 0] * 6]
+
+            wm.ICs(
+                model=model,
+                susceptibles_IC=susceptibles,
+                exposed1_IC=exposed1,
+                exposed2_IC=exposed2,
+                exposed3_IC=exposed3,
+                exposed4_IC=exposed4,
+                exposed5_IC=exposed51,
+                infectives_sym_IC=infectives_sym,
+                infectives_asym_IC=infectives_asym,
+                recovered_IC=recovered)
+
+        with self.assertRaises(TypeError):
+            exposed51 = [[0, '0'] + [0, 0] * 5, [0, 0] * 6]
+
+            wm.ICs(
+                model=model,
+                susceptibles_IC=susceptibles,
+                exposed1_IC=exposed1,
+                exposed2_IC=exposed2,
+                exposed3_IC=exposed3,
+                exposed4_IC=exposed4,
+                exposed5_IC=exposed51,
+                infectives_sym_IC=infectives_sym,
+                infectives_asym_IC=infectives_asym,
+                recovered_IC=recovered)
+
+        with self.assertRaises(ValueError):
             infectives_sym1 = [10, 20]
 
             wm.ICs(
@@ -994,7 +1054,7 @@ class TestDiseaseParameters(unittest.TestCase):
     def test__call__(self):
         model = examplemodel
 
-        d = [0.05, 0.02]
+        d = 0.05
         tau = 0.4
         we = [0.02, 0.02, 0]
         omega = 1
@@ -1008,7 +1068,7 @@ class TestDiseaseParameters(unittest.TestCase):
         )
 
         self.assertEqual(DiseaseParameters(),
-                         [[0.05, 0.02], 0.4, [0.02, 0.02, 0], 1])
+                         [[0.05, 0.05], 0.4, [0.02, 0.02, 0], 1])
 
 #
 # Test Transmission Class
@@ -1275,7 +1335,14 @@ class TestSocDistParameters(unittest.TestCase):
         self.assertEqual(SocDistParam.model, model)
         npt.assert_array_equal(SocDistParam.phi, np.ones(2))
 
-        phi = 0.2
+        phi = [0.2, 0.2]
+
+        SocDistParam = wm.SocDistParameters(
+            model=model,
+            phi=phi)
+
+        self.assertEqual(SocDistParam.model, model)
+        npt.assert_array_equal(SocDistParam.phi, 0.2 * np.ones(2))
 
         with self.assertRaises(TypeError):
             model1 = {'0': 0}
@@ -1918,11 +1985,11 @@ class TestVaccineParameters(unittest.TestCase):
         vac = [3, 2]
         vacb = [0.5, 1]
         adult = [0, 0.9]
-        nu_tra = [1] * 6
-        nu_symp = [1] * 6
-        nu_inf = [1] * 6
-        nu_sev_h = [1] * 6
-        nu_sev_d = [1] * 6
+        nu_tra = 1
+        nu_symp = 1
+        nu_inf = 1
+        nu_sev_h = 1
+        nu_sev_d = 1
 
         VaccineParam = wm.VaccineParameters(
             model=model,
