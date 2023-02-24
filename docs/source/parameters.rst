@@ -2,7 +2,7 @@
 Model Parameters Classes
 ************************
 
-.. currentmodule:: epimodels
+.. currentmodule:: warwickmodel
 
 This page contains information about the different classes which contain parameters used for the forward simulation of the
 Warwick-Lancaster model.
