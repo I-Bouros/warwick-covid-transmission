@@ -856,7 +856,7 @@ class TestDiseaseParameters(unittest.TestCase):
     def test__init__(self):
         model = examplemodel
 
-        d = [0.05, 0.02]
+        d = 0.05
         tau = 0.4
         we = [0.02, 0.01, 0]
         omega = 1
@@ -870,7 +870,7 @@ class TestDiseaseParameters(unittest.TestCase):
         )
 
         self.assertEqual(DiseaseParameters.model, model)
-        npt.assert_array_equal(DiseaseParameters.d, np.array([0.05, 0.02]))
+        npt.assert_array_equal(DiseaseParameters.d, np.array([0.05, 0.05]))
         self.assertEqual(DiseaseParameters.tau, 0.4)
         npt.assert_array_equal(DiseaseParameters.we, np.array([0.02, 0.01, 0]))
         self.assertEqual(DiseaseParameters.omega, 1)
@@ -1054,7 +1054,7 @@ class TestDiseaseParameters(unittest.TestCase):
     def test__call__(self):
         model = examplemodel
 
-        d = 0.05
+        d = [0.05, 0.02]
         tau = 0.4
         we = [0.02, 0.02, 0]
         omega = 1
@@ -1068,7 +1068,7 @@ class TestDiseaseParameters(unittest.TestCase):
         )
 
         self.assertEqual(DiseaseParameters(),
-                         [[0.05, 0.05], 0.4, [0.02, 0.02, 0], 1])
+                         [[0.05, 0.02], 0.4, [0.02, 0.02, 0], 1])
 
 #
 # Test Transmission Class
