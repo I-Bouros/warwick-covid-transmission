@@ -1962,7 +1962,7 @@ class TestVaccineParameters(unittest.TestCase):
                 nu_symp=nu_symp,
                 nu_inf=nu_inf,
                 nu_sev_h=nu_sev_h,
-                nu_sev_dac=[0.5, '0.2', 1, 1, 1, 1]
+                nu_sev_d=[0.5, '0.2', 1, 1, 1, 1]
             )
 
         with self.assertRaises(ValueError):
@@ -2169,7 +2169,7 @@ class TestParametersController(unittest.TestCase):
             wm.ParametersController(
                 model=model,
                 regional_parameters=regional_parameters,
-                ICs=ICs1,
+                ICs_parameters=ICs1,
                 disease_parameters=disease_parameters,
                 transmission_parameters=transmission_parameters,
                 simulation_parameters=simulation_parameters,
