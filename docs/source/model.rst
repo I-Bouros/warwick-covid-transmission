@@ -9,7 +9,7 @@ of research reports for SAGE Working Group on COVID-19.
 It uses an extended version of an SEIR model and contact and region specific
 matrices.
 
-.. currentmodule:: epimodels
+.. currentmodule:: warwickmodel
 
 Overview:
 
