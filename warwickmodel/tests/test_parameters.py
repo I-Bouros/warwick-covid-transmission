@@ -1415,11 +1415,11 @@ class TestVaccineParameters(unittest.TestCase):
         vac = 3
         vacb = 0.5
         adult = [0, 0.9]
-        nu_tra = [1] * 6
-        nu_symp = [1] * 6
-        nu_inf = [1] * 6
-        nu_sev_h = [1] * 6
-        nu_sev_d = [1] * 6
+        nu_tra = 1
+        nu_symp = 1
+        nu_inf = 1
+        nu_sev_h = 1
+        nu_sev_d = 1
 
         VaccineParam = wm.VaccineParameters(
             model=model,
@@ -1985,11 +1985,11 @@ class TestVaccineParameters(unittest.TestCase):
         vac = [3, 2]
         vacb = [0.5, 1]
         adult = [0, 0.9]
-        nu_tra = 1
-        nu_symp = 1
-        nu_inf = 1
-        nu_sev_h = 1
-        nu_sev_d = 1
+        nu_tra = [1] * 6
+        nu_symp = [1] * 6
+        nu_inf = [1] * 6
+        nu_sev_h = [1] * 6
+        nu_sev_d = [1] * 6
 
         VaccineParam = wm.VaccineParameters(
             model=model,
