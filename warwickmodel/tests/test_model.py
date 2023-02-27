@@ -1226,11 +1226,13 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model.check_new_deaths_format(
                 new_hospitalisations, pHtoD, dHtoD1)
 
-        with self.assertRaises(TypeError):
+        with self.assertRaises(TypeError) as e:
             dHtoD1 = [1, '1'] * 17
 
             model.check_new_deaths_format(
                 new_hospitalisations, pHtoD, dHtoD1)
+
+            print(e)
 
         with self.assertRaises(ValueError):
             dHtoD1 = [-0.2] + [0.5] * 30
@@ -1316,7 +1318,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
         simulation_parameters = wm.SimParameters(
             model=model,
             method='RK45',
-            times=[1, 2],
+            times=np.arange(1, 61).tolist(),
             eps=False
         )
 
@@ -1367,10 +1369,60 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
 
         obs_death = [10, 12]
 
+        npt.assert_array_equal(
+            model.loglik_deaths(
+                obs_death, new_deaths, 0.5, 41),
+            np.zeros(len(age_groups)))
+
+        # Set ICs parameters
+        ICs_parameters = wm.ICs(
+            model=model,
+            susceptibles_IC=[[50, 60] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[12, 0] * 6, [14, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
+            recovered_IC=[[0, 0], [0, 0]]
+        )
+
+        # Set all parameters in the controller
+        parameters = wm.ParametersController(
+            model=model,
+            regional_parameters=regional_parameters,
+            ICs_parameters=ICs_parameters,
+            disease_parameters=disease_parameters,
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
+
+        pItoH = [1, 1]
+        dItoH = [1] * 30
+
+        pHtoD = [1, 1]
+        dHtoD = [1] * 30
+
+        new_infections = model.new_infections(
+            model.simulate(parameters))
+
+        new_hospitalisations = model.new_hospitalisations(
+            new_infections, pItoH, dItoH)
+
+        new_deaths = model.new_deaths(
+            new_hospitalisations, pHtoD, dHtoD)
+
         self.assertEqual(
             model.loglik_deaths(
-                obs_death, new_deaths, 0.5, 1).shape,
+                obs_death, new_deaths, 0.5, 4).shape,
             (len(age_groups),))
+
+        npt.assert_array_equal(
+            model.loglik_deaths(
+                obs_death, new_deaths, 0.5, 0),
+            np.zeros(len(age_groups)))
 
         with self.assertRaises(ValueError):
             model.loglik_deaths(
@@ -1382,7 +1434,7 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             model.loglik_deaths(
-                obs_death, new_deaths, 0.5, 2)
+                obs_death, new_deaths, 0.5, 62)
 
         with self.assertRaises(ValueError):
             model.loglik_deaths(
@@ -1641,13 +1693,57 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
         new_deaths = model.new_deaths(
             new_hospitalisations, pHtoD, dHtoD)
 
-        self.assertEqual(
-            model.samples_deaths(new_deaths, 0.5, 41).shape,
-            (len(age_groups),))
+        npt.assert_array_equal(
+            model.samples_deaths(new_deaths, 0.5, 41),
+            np.zeros(len(age_groups)))
+
+        # Set ICs parameters
+        ICs_parameters = wm.ICs(
+            model=model,
+            susceptibles_IC=[[50, 60] + [0, 0] * 5, [7, 8] + [0, 0] * 5],
+            exposed1_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed2_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed3_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed4_IC=[[0, 0] * 6, [0, 0] * 6],
+            exposed5_IC=[[0, 0] * 6, [0, 0] * 6],
+            infectives_sym_IC=[[12, 0] * 6, [14, 0] * 6],
+            infectives_asym_IC=[[0, 0] * 6, [0, 0] * 6],
+            recovered_IC=[[0, 0], [0, 0]]
+        )
+
+        # Set all parameters in the controller
+        parameters = wm.ParametersController(
+            model=model,
+            regional_parameters=regional_parameters,
+            ICs_parameters=ICs_parameters,
+            disease_parameters=disease_parameters,
+            transmission_parameters=transmission_parameters,
+            simulation_parameters=simulation_parameters,
+            vaccine_parameters=vaccine_parameters,
+            soc_dist_parameters=soc_dist_parameters)
+
+        pItoH = [1, 1]
+        dItoH = [1] * 30
+
+        pHtoD = [1, 1]
+        dHtoD = [1] * 30
+
+        new_infections = model.new_infections(
+            model.simulate(parameters))
+
+        new_hospitalisations = model.new_hospitalisations(
+            new_infections, pItoH, dItoH)
+
+        new_deaths = model.new_deaths(
+            new_hospitalisations, pHtoD, dHtoD)
 
         self.assertEqual(
-            model.samples_deaths(new_deaths, 0.5, 1).shape,
+            model.samples_deaths(new_deaths, 0.5, 4).shape,
             (len(age_groups),))
+
+        npt.assert_array_equal(
+            model.samples_deaths(new_deaths, 0.5, 0),
+            np.zeros(len(age_groups)))
 
         with self.assertRaises(ValueError):
             model.samples_deaths(new_deaths, 0.5, -1)

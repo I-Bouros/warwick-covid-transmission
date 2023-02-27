@@ -1955,7 +1955,7 @@ class TestVaccineParameters(unittest.TestCase):
         with self.assertRaises(TypeError):
             wm.VaccineParameters(
                 model=model,
-                vvac=vac,
+                vac=vac,
                 vacb=vacb,
                 adult=adult,
                 nu_tra=nu_tra,

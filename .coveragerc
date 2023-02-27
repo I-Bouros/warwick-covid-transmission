@@ -3,3 +3,6 @@ source = warwickmodel
 omit = 
     warwickmodel/tests/*
     warwickmodel/data/*
+
+[report]
+show_missing = True

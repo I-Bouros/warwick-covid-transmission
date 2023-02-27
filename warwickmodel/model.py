@@ -1472,9 +1472,6 @@ class WarwickLancSEIRModel(pints.ForwardModel):
         if np.asarray(dHtoD).shape[0] < 30:
             raise ValueError('Wrong number of delays between hospital \
                 admission and death.')
-        if np.sum(dHtoD) != 1:
-            raise ValueError('Distribution of delays between hospital \
-                admission and death must be normalised.')
         for _ in dHtoD:
             if not isinstance(_, (int, float)):
                 raise TypeError('Delays between  hospital \
