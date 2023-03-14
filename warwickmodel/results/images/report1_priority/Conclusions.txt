@@ -1,0 +1,4 @@
+Summary figures:
+- Prioritising the 75+ first scenario yields the lowest number of deaths
+  compared to other scenarios.
+- No visible differences in number of infections between scenarios.

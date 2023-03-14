@@ -1,0 +1,15 @@
+Summary figures:
+- Prioritising the 75+ first scenario is performing best compared to other scenarios.
+- No visible differences in number of infections between scenarios.
+- The higher the percentage of uptake, the smaller the number of deaths and infections.
+  However these differences are negligible, (~0.05 per 100k for deaths between the 90% and 50%).
+- The differences between this and the next best scenario also start to decrease with the decrease in the levels of uptake.
+  However, for 50% uptake we see the second best scenario is no longer equivalent to the third, as the lower uptake allows for more of the
+  older age-groups to vaccinated, which we establised are more prone to both death and hospilatisation then their younger counterparts.
+  (We can see that in the pie-charts)
+
+Scatter plots:
+- The similar reductions are observed in both the number of hospitalisations and deaths for all scenarios and serology percentages.
+- The bigger the percentage of uptake, the smaller the number of deaths and hospitalisations for the best scenario. For the other strategies,
+  (for which we start vaccinating younger people first, making us run out of boosters by the time we vaccinate the older, more at-risk individuals)
+  we see an occassional inversion of these orders for the reason stated above.

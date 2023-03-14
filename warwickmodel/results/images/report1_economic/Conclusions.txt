@@ -1,0 +1,4 @@
+Summary figures:
+- Prioritising the 75+ first scenario is yields the fewest number of years ol life lost
+  compared to other scenarios.
+- No visible differences in number of infections between scenarios.
