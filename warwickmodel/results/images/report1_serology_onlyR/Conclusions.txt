@@ -5,6 +5,6 @@ Summary figures:
   However these differences are negligible, (~0.07 per 100k for deaths between the 10% and 70%).
 
 Scatter plots:
-- The bigger reductions are observed in the number of hospitalisations compared to that of deaths for all scenarios and serology percentages.
-- For countries with less income, the differences in deaths are almost impeceptible when varying the percentage of known serology statuses.
-- The bigger the he percentage of known serology statuses, the smaller the number of deaths and hospitalisations.
+- The bigger the percentage of known serology statuses, the smaller the number of deaths and hospitalisations.
+- However, such reductions are only modest in the number of hospitalisations and deaths for all scenarios and serology percentages.
+- The differences observed are bigger in the case of higher income countries compared to the lower income countries considered.

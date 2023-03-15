@@ -10,6 +10,6 @@ Summary figures:
 
 Scatter plots:
 - The similar reductions are observed in both the number of hospitalisations and deaths for all scenarios and serology percentages.
-- In genereal, the bigger the percentage of known serology statuses, the smaller the number of deaths and hospitalisations. For some strategies and countries,
+- In general, the bigger the percentage of known serology statuses, the smaller the number of deaths and hospitalisations. For some strategies and countries,
   (for which we start vaccinating younger people first, making us run out of boosters by the time we vaccinate the older, more at-risk individuals)
   we see an occassional inversion of these orders for the reason stated above.
