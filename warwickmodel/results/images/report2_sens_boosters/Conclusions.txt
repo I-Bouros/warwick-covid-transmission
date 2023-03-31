@@ -1,0 +1,16 @@
+Summary figures:
+- Prioritising the 75+ first scenario is yields the fewest number of years ol life lost
+  compared to other scenarios.
+- The differences between this and the next best scenario also start to decrease with the decrease in the levels of available boosters.
+  However, for 20% population coverage we see the second best scenario is no longer equivalent to the third, but almost equal to the best scenario
+  of vaccinating the 75+ first. This is due to the fact that as larger population coverage allows for more of the
+  older age-groups to vaccinated, which we establised are more prone to both death and hospilatisation then their younger counterparts.
+  (We can see that in the pie-charts)
+- Comparing the different number of boosters for each scenario, we observe that the more boosters we have availble, the less
+  amount of years of life lost we observe, as expected.
+
+
+Scatter plots:
+- The similar reductions are observed in both the number of hospitalisations and years of life lost for all scenarios and serology percentages.
+- The effects on the number of hospitalisations are reduced for the worse scenarios.
+- The bigger the percentage of population coverage, the smaller the number of years of life lost and hospitalisations for all scenarios, as expected.

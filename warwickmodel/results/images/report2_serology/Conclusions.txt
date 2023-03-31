@@ -1,0 +1,15 @@
+Summary figures:
+- Prioritising the 75+ first scenario is performing best compared to other scenarios.
+- No visible differences in number of infections between scenarios.
+- However, the higher the percentage of known serology statuses, the bigger the number of years of life lost for
+  this first best scenario (75+ first) ~0.5 per 100k for years of life lost between the 10% and 70%. One explanation
+  for this phenomenon is that in this way we neglect to vaccinate a larger proporion of the older W1, who are slightly
+  more susceptible to getting infected and so dying then their younger counterparts, i.e. the number of years of life lost that would be
+  averted by vaccinating more of the elderly age groups exceeds the number of years of life lost that would be averted by vaccinating
+  more of the younger age groups. (We can see that in the pie-charts)
+
+Scatter plots:
+- The similar reductions are observed in both the number of hospitalisations and years of life lost for all scenarios and serology percentages.
+- In general, the bigger the percentage of known serology statuses, the smaller the number of years of life lost and hospitalisations. For some strategies and countries,
+  (for which we start vaccinating younger people first, making us run out of boosters by the time we vaccinate the older, more at-risk individuals)
+  we see an occassional inversion of these orders for the reason stated above.
