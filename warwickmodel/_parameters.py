@@ -962,17 +962,17 @@ class VaccineParameters(object):
         List of the proportions of each age-group that are boosted or
         vaccinated.
     nu_tra : int or float or list
-        Vaccine effects on transmission for different vaccination statuses
-        (unvaccinated, fully-vaccinated, boosted, partially-waned,
-        fully-waned, previous-variant immunity).
+        Vaccine effects on transmission for infected individuals of different
+        vaccination statuses (unvaccinated, fully-vaccinated, boosted,
+        partially-waned, fully-waned, previous-variant immunity).
     nu_symp : int or float or list
         Vaccine effects on symptom development for different vaccination
         statuses (unvaccinated, fully-vaccinated, boosted, partially-waned,
         fully-waned, previous-variant immunity).
     nu_inf : int or float or list
-        Vaccine effects on infectiousness for different vaccination
-        statuses (unvaccinated, fully-vaccinated, boosted, partially-waned,
-        fully-waned, previous-variant immunity).
+        Vaccine effects on susceptability for susceptible individuals of
+        different vaccination statuses (unvaccinated, fully-vaccinated,
+        boosted, partially-waned, fully-waned, previous-variant immunity).
     nu_sev_h : int or float or list
         Vaccine effects on hospitalised severe outcomes for different
         vaccination statuses (unvaccinated, fully-vaccinated, boosted,
@@ -1053,17 +1053,17 @@ class VaccineParameters(object):
             List of the proportions of each age-group that are boosted or
             vaccinated.
         nu_tra : int or float or list
-            Vaccine effects on transmission for different vaccination statuses
-            (unvaccinated, fully-vaccinated, boosted, partially-waned,
-            fully-waned, previous-variant immunity).
+            Vaccine effects on transmission for infected individuals of
+            different vaccination statuses (unvaccinated, fully-vaccinated,
+            boosted, partially-waned, fully-waned, previous-variant immunity).
         nu_symp : int or float or list
             Vaccine effects on symptom development for different vaccination
             statuses (unvaccinated, fully-vaccinated, boosted, partially-waned,
             fully-waned, previous-variant immunity).
         nu_inf : int or float or list
-            Vaccine effects on infectiousness for different vaccination
-            statuses (unvaccinated, fully-vaccinated, boosted, partially-waned,
-            fully-waned, previous-variant immunity).
+            Vaccine effects on susceptability for susceptible individuals of
+            different vaccination statuses (unvaccinated, fully-vaccinated,
+            boosted, partially-waned, fully-waned, previous-variant immunity).
         nu_sev_h : int or float or list
             Vaccine effects on hospitalised severe outcomes for different
             vaccination statuses (unvaccinated, fully-vaccinated, boosted,
@@ -1348,7 +1348,7 @@ class ParametersController(object):
         transmission_parameters : Transmission
             Class of the rates of progression parameters used in the
             simulation of the model.
-        accine_parameters : VaccineParameters
+        vaccine_parameters : VaccineParameters
             Class of the vaccine-specific parameters used in the simulation of
             the model.
         simulation_parameters : SimParameters

@@ -469,36 +469,36 @@ class WarwickLancSEIRModel(pints.ForwardModel):
             self.contacts_timeline.identify_current_contacts(r, t)
 
         # Write actual RHS
-        lam = nu_inf[0] * np.multiply(beta, np.dot(
+        lam = nu_tra[0] * np.multiply(beta, np.dot(
             cont_mat, np.multiply(
                 np.asarray(i) + tau * np.asarray(a), (1 / self._N[r-1]))))
-        lam += nu_inf[1] * np.multiply(beta, np.dot(
+        lam += nu_tra[1] * np.multiply(beta, np.dot(
             cont_mat, np.multiply(
                 np.asarray(iF) + tau * np.asarray(aF), (1 / self._N[r-1]))))
-        lam += nu_inf[2] * np.multiply(beta, np.dot(
+        lam += nu_tra[2] * np.multiply(beta, np.dot(
             cont_mat, np.multiply(
                 np.asarray(iB) + tau * np.asarray(aB), (1 / self._N[r-1]))))
-        lam += nu_inf[3] * np.multiply(beta, np.dot(
+        lam += nu_tra[3] * np.multiply(beta, np.dot(
             cont_mat, np.multiply(
                 np.asarray(iW1) + tau * np.asarray(aW1), (1 / self._N[r-1]))))
-        lam += nu_inf[4] * np.multiply(beta, np.dot(
+        lam += nu_tra[4] * np.multiply(beta, np.dot(
             cont_mat, np.multiply(
                 np.asarray(iW2) + tau * np.asarray(aW2), (1 / self._N[r-1]))))
-        lam += nu_inf[5] * np.multiply(beta, np.dot(
+        lam += nu_tra[5] * np.multiply(beta, np.dot(
             cont_mat, np.multiply(
                 np.asarray(iW3) + tau * np.asarray(aW3), (1 / self._N[r-1]))))
 
-        lam_times_s = omega * phi * nu_tra[0] * np.multiply(s, lam)
+        lam_times_s = omega * phi * nu_inf[0] * np.multiply(s, lam)
 
-        lam_times_sF = omega * phi * nu_tra[1] * np.multiply(sF, lam)
+        lam_times_sF = omega * phi * nu_inf[1] * np.multiply(sF, lam)
 
-        lam_times_sB = omega * phi * nu_tra[2] * np.multiply(sB, lam)
+        lam_times_sB = omega * phi * nu_inf[2] * np.multiply(sB, lam)
 
-        lam_times_sW1 = omega * phi * nu_tra[3] * np.multiply(sW1, lam)
+        lam_times_sW1 = omega * phi * nu_inf[3] * np.multiply(sW1, lam)
 
-        lam_times_sW2 = omega * phi * nu_tra[4] * np.multiply(sW2, lam)
+        lam_times_sW2 = omega * phi * nu_inf[4] * np.multiply(sW2, lam)
 
-        lam_times_sW3 = omega * phi * nu_tra[5] * np.multiply(sW3, lam)
+        lam_times_sW3 = omega * phi * nu_inf[5] * np.multiply(sW3, lam)
 
         dydt = np.concatenate((
             -lam_times_s - vac * np.multiply(adult, s) - vacb * np.multiply(
