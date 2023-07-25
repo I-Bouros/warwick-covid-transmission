@@ -502,7 +502,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
 
         dydt = np.concatenate((
             -lam_times_s - vac * np.multiply(adult, s) - vacb * np.multiply(
-                adult, s) + we2 * np.asarray(sW2) + we1 * np.asarray(sW3),
+                adult, s) + we2 * np.asarray(sW2) + 0 * np.asarray(sW3),
             -lam_times_sF + vac * np.multiply(adult, s) + vac * np.multiply(
                 adult, sW1) + vac * np.multiply(
                 adult, sW2) + vac * np.multiply(adult, sW3) - we1 * np.asarray(
@@ -522,7 +522,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
                 sW1) - we2 * np.asarray(sW2) - we3 * np.asarray(sW2),
             -lam_times_sW3 - vac * np.multiply(
                 adult, sW3) - vacb * np.multiply(
-                adult, sW3) + we3 * np.asarray(sW2) - we1 * np.asarray(sW3),
+                adult, sW3) + we3 * np.asarray(sW2) - 0 * np.asarray(sW3),
             lam_times_s - alpha * np.asarray(e1),
             alpha * (np.asarray(e1) - np.asarray(e2)),
             alpha * (np.asarray(e2) - np.asarray(e3)),
