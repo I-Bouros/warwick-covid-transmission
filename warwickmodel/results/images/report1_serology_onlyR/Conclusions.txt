@@ -1,0 +1,10 @@
+Summary figures:
+- Prioritising the 75+ first scenario is performing best compared to other scenarios.
+- No visible differences in number of infections between scenarios.
+- The higher the percentage of known serology statuses, the smaller the number of deaths and infections.
+  However these differences are negligible, (~0.07 per 100k for deaths between the 10% and 70%).
+
+Scatter plots:
+- The bigger the percentage of known serology statuses, the smaller the number of deaths and hospitalisations.
+- However, such reductions are only modest in the number of hospitalisations and deaths for all scenarios and serology percentages.
+- The differences observed are bigger in the case of higher income countries compared to the lower income countries considered.
