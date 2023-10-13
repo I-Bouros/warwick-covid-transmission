@@ -1226,13 +1226,11 @@ class TestWarwickLancSEIRModel(unittest.TestCase):
             model.check_new_deaths_format(
                 new_hospitalisations, pHtoD, dHtoD1)
 
-        with self.assertRaises(TypeError) as e:
+        with self.assertRaises(TypeError):
             dHtoD1 = [1, '1'] * 17
 
             model.check_new_deaths_format(
                 new_hospitalisations, pHtoD, dHtoD1)
-
-            print(e)
 
         with self.assertRaises(ValueError):
             dHtoD1 = [-0.2] + [0.5] * 30
