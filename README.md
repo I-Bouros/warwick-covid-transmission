@@ -7,7 +7,9 @@
 [![codecov](https://codecov.io/gh/I-Bouros/warwick-covid-transmission/branch/main/graph/badge.svg?token=SNHCUJIS3B)](https://codecov.io/gh/I-Bouros/warwick-covid-transmission)
 [![Style (flake8)](https://github.com/I-Bouros/warwick-covid-transmission/actions/workflows/flake8-style-test.yml/badge.svg)](https://github.com/I-Bouros/warwick-covid-transmission/actions/workflows/flake8-style-test.yml)
 
-This is a reimplementation of the Warwick-Lancaster model.
+This is a reimplementation of the Warwick-Lancaster model. This work was commissioned by the World Health Organisation (WHO) Strategic Advisory Group of Experts on Immunisation (SAGE) Covid-19 Working Group. Below we include a model schematic:
+
+![Warwick-Lancaster model conceptualisation](./images/Warwick_model.pdf)
 
 All features of our software are described in detail in our
 [full API documentation](https://warwick-covid-transmission.readthedocs.io/en/latest/).
