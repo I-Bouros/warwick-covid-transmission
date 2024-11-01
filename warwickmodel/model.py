@@ -40,7 +40,7 @@ class WarwickLancSEIRModel(pints.ForwardModel):
     (:math:`S`), exposed but not yet infectious (:math:`E`), infectious
     (:math:`I`) and recovered (:math:`R`).
 
-    In the Warwick-Lancaster model framework, the exposed are split into 5x5
+    In the Warwick-Lancaster model framework, the exposed are split into 5x6
     compartments to allow waiting time as an exposed to be Erlang-distributed,
     as well as depending on the immunity status due to the vaccine of the
     individual exposed. Meanwhile, the infectious compartment is split into 10

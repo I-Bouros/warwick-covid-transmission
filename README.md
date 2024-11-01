@@ -7,7 +7,9 @@
 [![codecov](https://codecov.io/gh/I-Bouros/warwick-covid-transmission/branch/main/graph/badge.svg?token=SNHCUJIS3B)](https://codecov.io/gh/I-Bouros/warwick-covid-transmission)
 [![Style (flake8)](https://github.com/I-Bouros/warwick-covid-transmission/actions/workflows/flake8-style-test.yml/badge.svg)](https://github.com/I-Bouros/warwick-covid-transmission/actions/workflows/flake8-style-test.yml)
 
-This is a reimplementation of the Warwick-Lancaster model.
+This is a reimplementation of the Warwick-Lancaster model. This work was commissioned by the World Health Organisation (WHO) Strategic Advisory Group of Experts on Immunisation (SAGE) Covid-19 Working Group. Below we include a model schematic:
+
+![Warwick-Lancaster model conceptualisation](./images/Warwick_model.jpg)
 
 All features of our software are described in detail in our
 [full API documentation](https://warwick-covid-transmission.readthedocs.io/en/latest/).
@@ -17,6 +19,8 @@ papers:
 
 ## References
 [1] Moore, S., Hill, E.M., Dyson, L. et al. [Retrospectively modeling the effects of increased global vaccine sharing on the COVID-19 pandemic](https://doi.org/10.1038/s41591-022-02064-y). Nat Med 28, 2416–2423 (2022).
+
+[2] Bouros, I., Thompson, R.N., Keeling, M.J., Hill, E.M., Moore, S., [Warwick-Lancaster Global Covid-19 Model](https://ssrn.com/abstract=4654753 or http://dx.doi.org/10.2139/ssrn.4654753). 9TH INTERNATIONAL CONFERENCE ON INFECTIOUS DISEASE DYNAMICS:P1.082 (2023),
 
 ## Installation procedure
 ***
